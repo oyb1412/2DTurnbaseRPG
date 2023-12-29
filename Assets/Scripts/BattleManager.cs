@@ -66,7 +66,7 @@ public class BattleManager : MonoBehaviour
 
                             //남아있는 적의 숫자를 확인
 
-                            if (enemys.Length > 0)
+                            if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
                                 //남아있는 적의 수가 1 이상인 경우 changeplayer로 이동
                                 StartCoroutine(ContinuationCroutine("생존한 적이 존재하므로 전투를 계속합니다"));
@@ -124,7 +124,7 @@ public class BattleManager : MonoBehaviour
                             //die코루틴 내부에서는 플레이어 오브젝트를 지우고 그에 걸맞는 텍스트 출력후
                             StartCoroutine(PlayerDieCroutine());
                             //남아있는 플레이어의 숫자를 확인
-                            if (players.Length > 1)
+                            if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                             {
                                 //남아있는 플레이어의 수가 1 이상인 경우 changeplayer로 이동
                                 StartCoroutine(ContinuationCroutine("생존한 플레이어가 존재하므로 전투를 계속합니다"));
@@ -226,7 +226,7 @@ public class BattleManager : MonoBehaviour
     }
     IEnumerator PlayerChangeCroutine()
     {
-        battleInfo.text = string.Format("{0}의 공격 순서입니다.", players[myTurn + 1]);
+        battleInfo.text = string.Format("{0}의 공격 순서입니다.", players[myTurn + 1].name);
         yield return new WaitForSeconds(1f);
         if (trigger)
         {

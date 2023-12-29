@@ -790,7 +790,7 @@ PrefabInstance:
       objectReference: {fileID: 1455374880416929886, guid: f8a2db546507cf84d8d4ea636817fe63, type: 3}
     - target: {fileID: 1546519971774014052, guid: 976364b55741c9d498c12927c57a7681, type: 3}
       propertyPath: maxHp
-      value: 10
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 1546519971774014052, guid: 976364b55741c9d498c12927c57a7681, type: 3}
       propertyPath: attackDamage
@@ -905,7 +905,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1546519971774014052, guid: 976364b55741c9d498c12927c57a7681, type: 3}
       propertyPath: maxHp
-      value: 10
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 1546519971774014052, guid: 976364b55741c9d498c12927c57a7681, type: 3}
       propertyPath: attackDamage

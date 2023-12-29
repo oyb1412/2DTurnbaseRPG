@@ -33,6 +33,9 @@ public class EnemyManager : MonoBehaviour
         hpbar.value = currentHp / maxHp;
         //슬라이더 밸류 설정
     }
-
+    private void OnDisable()
+    {
+        hpbar.gameObject.SetActive(false);
+    }
 
 }
