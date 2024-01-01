@@ -5,6 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - FieldEnemy
+  - FieldPlayer
+  - FieldVillage
+  - SpawnPoint
+  - FxTemporaire
+  - ButtonInfo
+  - AttackButtonInfo
+  - SkillButtonInfo
+  - HealButtonInfo
   layers:
   - Default
   - TransparentFX
@@ -12,7 +21,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - text
   - 
   - 
   - 
@@ -41,4 +50,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: text
+    uniqueID: 4241161533
     locked: 0

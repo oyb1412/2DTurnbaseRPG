@@ -1,289 +1,421 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static EnemyManager;
+using static UnityEditor.PlayerSettings;
 
 public class BattleManager : MonoBehaviour
 {
     public PlayerManager[] players;
     public EnemyManager[] enemys;
-    SpriteRenderer enemySpriter;
     EnemyManager targetEnemy;
     PlayerManager targetPlayer;
+    public Button[] buttons;
     public int myTurn;
+    public int deadCount;
     Collider2D target;
-    bool trigger;
+    public bool trigger;
+    bool moveTrigger;
     //열거형으로 현재 플레이어의 상세한 state를 설정
-    public enum BattleState {main, select,attack,changePlayer}
+    public enum BattleState {main, skillselect, targetselect,attack,Check, changePlayer, Win, Lose,
+        oneTargetSkill, allTargetSkill, Heal,allTargetSkillAttack,oneTargetSkillAttack,useHeal,
+    allTargetSkillCheck}
     public BattleState state;
     public Text battleInfo;
+    public Image EenmyInfoImage;
+    public Image PlayerInfoImage;
+    int gold;
+    public Image arrowImage;
+    public Image textImage;
+    Text EnemyInfoText;
+    Text PlayerInfoText;
+    public GameData[] gameData;
+    public Texture2D cursurIcon;
+    public GameObject buttonsParent;
+    public Image buttonInfoImage;
+    public Text buttonInfoText;
+    PlayerManager player;
+    EnemyManager enemy;
+    Image[] buttonsImage = new Image[3];
     // Start is called before the first frame update
     void Start()
     {
-        //모든 플레이어 저장
+        AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, true);
+        EnemyInfoText = EenmyInfoImage.gameObject.GetComponentInChildren<Text>();
+        PlayerInfoText = PlayerInfoImage.gameObject.GetComponentInChildren<Text>();
+        buttonsParent.gameObject.SetActive(false);
+        textImage.gameObject.SetActive(false);
+        arrowImage.gameObject.SetActive(false);
     }
-    
+
     // Update is called once per frame
     void Update()
     {
- 
+        if (!GameManager.instance.isPlaying)
+            return;
 
-            switch (StateManager.instance.currentState)
-        {
-            case StateManager.BattleState.PlayerTurn:
+             switch (StateManager.instance.currentState)
+            {
+                case StateManager.BattleState.PlayerTurn:
                 switch (state)
                 {
                     case BattleState.main:
-                        StartCoroutine(MainCorutine());
+                        players = RealizePlayer();
+                        enemys = RealizeEnemy();
+                        textImage.gameObject.SetActive(true);
+                        battleInfo.text = string.Format("{0}의 공격 순서입니다.", players[myTurn].playerName);
+                        ChangeState(BattleState.skillselect);
                         break;
-                    case BattleState.select:
-                        //공격할 대상 선택(마우스 클릭)
+                    case BattleState.skillselect:
+                        battleInfo.text = string.Format("행동을 선택하세요.");
+                        ButtonInfo();
+                        if (gameData[myTurn].playerCurrentHp < 10)
+                        {
+                            buttons[1].interactable = false;
+                        }
+
+                        buttonsParent.gameObject.SetActive(true);
+                        arrowImage.gameObject.SetActive(true);
+
+                        RectTransform rect = buttonsParent.transform.GetComponent<RectTransform>();
+                        buttonsParent.transform.position = new Vector3(players[myTurn].transform.position.x+3.5f,
+                            players[myTurn].transform.position.y+1.5f,
+                            players[myTurn].transform.position.z);
+
+
+                        break;
+                    case BattleState.allTargetSkill:
+                        battleInfo.text = string.Format("체력을 소모해 모든 적에게 피해를 입힙니다.");
+                        ChangeState(BattleState.allTargetSkillAttack);
+
+                        break;
+                    case BattleState.oneTargetSkill:
+                        battleInfo.text = string.Format("체력을 소모해 강한 공격을 가합니다. \n공격 대상을 선택하세요.");
                         target = SelectEnemy();
                         if (target != null)
                         {
-                            StartCoroutine(PlayerSelectCroutine());
+                            targetEnemy = target.gameObject.GetComponent<EnemyManager>();
+                            ChangeState(BattleState.oneTargetSkillAttack);
+                        }
+                        break;
+                    case BattleState.Heal:
+                        battleInfo.text = string.Format("자가회복을 시도합니다.");
+                        ChangeState(BattleState.useHeal);
+                        break;
+                    case BattleState.allTargetSkillAttack:
+                        battleInfo.text = string.Format("모든 적에게 {0}만큼의 피해를 입힙니다.", gameData[myTurn].playerAttackDamage);
+
+                        if (!trigger)
+                        {
+                            gameData[myTurn].playerCurrentHp -= 10;
+                            players[myTurn].SetAttack = true;
+                            trigger = true;
+                        }
+                        players[myTurn].AllTargetAttack(enemys, 1);
+
+                        if (!players[myTurn].SetAttack)
+                            ChangeState(BattleState.allTargetSkillCheck);
+
+                        break;
+                    case BattleState.allTargetSkillCheck:
+                        if (!trigger)
+                        {
+                            for (int i = 0; i < enemys.Length; i++)
+                            {
+                                if (enemys[i].currentHp <= 0)
+                                {
+                                    deadCount++;
+                                }
+                            }
+                            trigger = true;
+                        }
+                        if (deadCount > 0)
+                        {
+                            battleInfo.text = string.Format("{0}의 스킬 공격으로 적이 쓰러졌습니다.", players[myTurn].playerName);
+                            if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
+                            {
+                                ChangeState(BattleState.changePlayer);
+                            }
+                            else
+                            {
+                                battleInfo.text = "전투에서 승리했습니다!";
+                                int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
+                                switch (enemyType)
+                                {
+                                    case 0:
+                                        gold = Random.Range(60, 80);
+                                        break;
+                                    case 1:
+                                        gold = Random.Range(70, 90);
+                                        break;
+                                    case 2:
+                                        gold = Random.Range(80, 100);
+                                        break;
+                                }
+
+                                ChangeState(BattleState.Win);
+                             }
+                        }
+                        else
+                        {
+                            trigger = false;
+                            state = BattleState.changePlayer;
+                        }
+                        
+                        break;
+                    case BattleState.oneTargetSkillAttack:
+                        battleInfo.text = string.Format("적 {0}에게 {1}만큼의 피해를 입힙니다.", targetEnemy.enemyName, players[myTurn].attackDamage * 2f);
+
+                        if (!trigger)
+                        {
+                            gameData[myTurn].playerCurrentHp -= 10;
+                            players[myTurn].SetAttack = true;
+                            trigger = true;
+                        }
+                        players[myTurn].Attack(targetEnemy, 1);
+
+                        if (!players[myTurn].SetAttack)
+                            ChangeState(BattleState.Check);
+                        break;
+                    case BattleState.useHeal:
+                        if (!trigger)
+                        {
+                            players[myTurn].SetHeal = true;
+                            battleInfo.text = string.Format("{0}의 체력을 회복했습니다.", (gameData[myTurn].skillDamage));
+                            gameData[myTurn].playerCurrentHp += (gameData[myTurn].skillDamage);
+                            Transform effect = Instantiate(players[myTurn].effectPrefabs[2], players[myTurn].transform).transform;
+                            effect.transform.position = new Vector3(players[myTurn].transform.position.x,
+                                players[myTurn].transform.position.y-0.5f,
+                                players[myTurn].transform.position.z);
+                            trigger = true;
+                        }
+                        ChangeState(BattleState.changePlayer);
+                        break;
+                    case BattleState.targetselect:
+                        battleInfo.text = string.Format("대상을 선택하세요.");
+
+                        PlyerInfo();
+                        target = SelectEnemy();
+                        if (target != null)
+                        {
+                            targetEnemy = target.gameObject.GetComponent<EnemyManager>();
+                            state = BattleState.attack;
                         }
                         break;
                     case BattleState.attack:
-                        //공격(체력감소)
-                        if (!trigger)
-                        {
-                            targetEnemy.currentHp -= players[myTurn].attackDamage;
-                            if (targetEnemy.currentHp <= 0)
-                                targetEnemy.gameObject.SetActive(false);
+                        battleInfo.text = string.Format("{0}의 피해를 입혔습니다.",gameData[myTurn].playerAttackDamage);
 
+                        if(!trigger)
+                        {
+                            //공격(체력감소)
+                            players[myTurn].SetAttack = true;
                             trigger = true;
                         }
+                        players[myTurn].Attack(targetEnemy,0);
 
-                        StartCoroutine(PlayerAttackCroutine());
+                        if (!players[myTurn].SetAttack)
+                            ChangeState(BattleState.Check);
 
-                        //공격으로 targetEnemy.currentHp가 0 이하가 되면 die코루틴 실행,
+                        break;
+                    case BattleState.Check:
                         if (targetEnemy.currentHp <= 0)
                         {
-                            //die코루틴 내부에서는 적 오브젝트를 지우고 그에 걸맞는 텍스트 출력후
-                            StartCoroutine(EnemyDieCroutine());
-
-                            //남아있는 적의 숫자를 확인
-
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
-                                //남아있는 적의 수가 1 이상인 경우 changeplayer로 이동
-                                StartCoroutine(ContinuationCroutine("생존한 적이 존재하므로 전투를 계속합니다"));
+                                battleInfo.text = string.Format("살아있는 적이 존재하므로 전투를 지속합니다.", gameData[myTurn].playerAttackDamage);
 
+                                ChangeState(BattleState.changePlayer);
                             }
-                            else //남아있는 적의 수가 0인 경우 StateManager.BattleState.Win으로 이동.
+                            else
                             {
-                                StartCoroutine(WinCorutine());//여기에서 남은 적 오브젝트 전부 삭제 or 오브젝트 풀링으로 이용
+                                battleInfo.text = string.Format("전투에서 승리했습니다!", gameData[myTurn].playerAttackDamage);
+
+                                int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
+                                switch (enemyType)
+                                {
+                                    case 0:
+                                        gold = Random.Range(60, 80);
+                                        break;
+                                    case 1:
+                                        gold = Random.Range(70, 90);
+                                        break;
+                                    case 2:
+                                        gold = Random.Range(80, 100);
+                                        break;
+                                }
+                                ChangeState(BattleState.Win);
+
                             }
                         }
                         else
                         {
-                            StartCoroutine(ContinuationCroutine(string.Format("{0}를 공격해 {1}의 피해를 입혔습니다.", targetEnemy.name, players[myTurn].attackDamage)));
+                            state = BattleState.changePlayer;
+                        }
+                        break;
+                    case BattleState.Win:
+                        battleInfo.text = string.Format("{0}골드를 보상으로 획득했습니다!", gold * gameData[0].currentPlayerNumber);
+                        
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            gameData[0].currentGold = gameData[0].currentGold + (gold * gameData[0].currentPlayerNumber);
+                            AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, false);
+
+                            GameManager.instance.ActionFade((int)GameManager.Scenes.FieldScene);
                         }
                         break;
                     case BattleState.changePlayer:
                         //공격 후 다음순번 플레이어 선택
                         if (players.Length > myTurn + 1)
                         {
-                            StartCoroutine(PlayerChangeCroutine());
+                            battleInfo.text = string.Format("{0}에게 턴이 넘어갑니다.", players[myTurn + 1].playerName);
+
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                myTurn++;
+                                state = BattleState.main;
+                            }
+
+                            ChangeState(BattleState.main);
                         }
-                        else//플레이어의 수 만큼 공격이 끝나면 적 턴으로 넘김
+                        else
                         {
-                            StartCoroutine(PlayerTurnChangeCroutine());
+                            battleInfo.text = "플레이어의 공격이 끝났습니다. 턴을 넘깁니다";
+
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                textImage.gameObject.SetActive(false);
+
+                                myTurn = 0;
+                                state = BattleState.main;
+                                StateManager.instance.ChangeTurn(StateManager.BattleState.EnemyTurn);
+                            }
                         }
+
                         break;
                 }
                 break;
-
-            case StateManager.BattleState.EnemyTurn:
+                case StateManager.BattleState.EnemyTurn:
                 switch (state)
                 {
-                    case BattleState.select:
+                    case BattleState.main:
                         enemys = RealizeEnemy();
                         players = SelectPlayer();
-                        //공격할 대상 선택
+                        textImage.gameObject.SetActive(true);
+
+                        battleInfo.text = string.Format("{0}의 공격 순서입니다.", enemys[myTurn].enemyName);
+                        ChangeState(BattleState.targetselect);
+                        break;
+                    case BattleState.targetselect:
                         target = players[myTurn].GetComponent<Collider2D>();
                         if (target != null)
                         {
-                            StartCoroutine(EnemySelectCroutine());
+                            targetPlayer = target.gameObject.GetComponent<PlayerManager>();
+                            battleInfo.text = string.Format("적{0}가 공격 대상으로 {1}를 선택했습니다.", enemys[myTurn].enemyName, targetPlayer.playerName);
+                            ChangeState(BattleState.attack);
                         }
                         break;
                     case BattleState.attack:
-                        //공격(체력감소)
+                        battleInfo.text = string.Format("{0}가 공격받아 {1}의 피해를 입었습니다.", targetPlayer.playerName, enemys[myTurn].attackDamage);
+
                         if (!trigger)
                         {
-                            targetPlayer.currentHp -= enemys[myTurn].attackDamage;
+                            targetPlayer.gameData.playerCurrentHp -= enemys[myTurn].attackDamage;
+                            enemys[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        StartCoroutine(EnemyAttackCroutine());
+                        enemys[myTurn].Attack(targetPlayer);
 
-                        //targetPlayer.currentHp가 0 이하가 되면 die코루틴 실행,
-                        if (targetPlayer.currentHp <= 0)
+                        if (!enemys[myTurn].SetAttack)
+                            ChangeState(BattleState.Check);
+                        break;
+                    case BattleState.Check:
+                        if (targetPlayer.gameData.playerCurrentHp <= 0)
                         {
-                            //die코루틴 내부에서는 플레이어 오브젝트를 지우고 그에 걸맞는 텍스트 출력후
-                            StartCoroutine(PlayerDieCroutine());
-                            //남아있는 플레이어의 숫자를 확인
+                            battleInfo.text = string.Format("{0}의 공격으로 {1}가 쓰러졌습니다.", enemys[myTurn].enemyName, targetPlayer.playerName);
                             if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                             {
-                                //남아있는 플레이어의 수가 1 이상인 경우 changeplayer로 이동
-                                StartCoroutine(ContinuationCroutine("생존한 플레이어가 존재하므로 전투를 계속합니다"));
+                                ChangeState(BattleState.changePlayer);
                             }
                             else
                             {
-                                //남아있는 플레이어의 수가 0인 경우 StateManager.BattleState.Lose으로 이동.
-                                StartCoroutine(LoseCorutine());
+                                battleInfo.text = "전투에서 패배했습니다...";
+                                gold = Random.Range(30, 100);
+                                ChangeState(BattleState.Lose);
+
+                              
                             }
                         }
                         else
                         {
-                            StartCoroutine(ContinuationCroutine(string.Format("{0}를 공격해 {1}의 피해를 입혔습니다.", targetPlayer.name, enemys[myTurn].attackDamage)));
+                            trigger = false;
+                            state = BattleState.changePlayer;
+                        }
+                        break;
+                    case BattleState.Lose:
+                        battleInfo.text = "전투 패배로 100 골드를 잃었습니다.\n" + "가까운 마을로 이동합니다.";
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            if(gameData[0].currentGold > 100)
+                            {
+                                gameData[0].currentGold -= 100;
+                            }
+                            if (gameData[0].currentGold <= 100)
+                            {
+                                gameData[0].currentGold = 0;
+                            }
+                            for(int i = 0; i < players.Length; i++)
+                            {
+                                gameData[i].playerCurrentHp = gameData[i].playerMaxHp;
+                            }
+                            gameData[0].playerFieldPosition = new Vector2(-9.3f, -9.5f);
+                            AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, false);
 
+                            GameManager.instance.ActionFade((int)GameManager.Scenes.FieldScene);
                         }
                         break;
                     case BattleState.changePlayer:
                         //공격 후 다음순번 플레이어 선택
                         if (enemys.Length > myTurn + 1)
                         {
-                            StartCoroutine(EnemyChangeCroutine());
+                            battleInfo.text = string.Format("{0}에게 턴이 넘어갑니다.", enemys[myTurn + 1].enemyName);
+
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                myTurn++;
+                                trigger = false;
+                                state = BattleState.main;
+                            }
                         }
                         else//적의 수 만큼 공격이 끝나면 적 턴으로 넘김
                         {
-                            StartCoroutine(EnemyTurnChangeCroutine());
+                            battleInfo.text = "적의 공격이 끝났습니다. 턴을 넘깁니다";
+                            if (Input.GetMouseButtonDown(0))
+                            {
+                                textImage.gameObject.SetActive(false);
+                                myTurn = 0;
+                                trigger = false;
+                                state = BattleState.main;
+                                StateManager.instance.ChangeTurn(StateManager.BattleState.PlayerTurn);
+                            }
                         }
                         break;
                 }
                 break;
-        }
+            }
     }
-    IEnumerator WinCorutine()
+   
+    void ChangeState(BattleState type)
     {
-        battleInfo.text = "전투에서 승리했습니다!";
-
-        yield return new WaitForSeconds(1f);
-        //foreach (var enemy in enemys) 
-        //{
-        //    Destroy(enemy.gameObject);
-        //}
-        StateManager.instance.ChangeTurn(StateManager.BattleState.Win);
-
-    }
-
-    IEnumerator LoseCorutine()
-    {
-        battleInfo.text = "전투에서 패배했습니다...";
-
-        yield return new WaitForSeconds(1f);
-        StateManager.instance.ChangeTurn(StateManager.BattleState.Lose);
-
-    }
-
-    IEnumerator ContinuationCroutine(string text)
-    {
-        battleInfo.text = text;
-
-        yield return new WaitForSeconds(1f);
-        state = BattleState.changePlayer;
-
-    }
-
-    IEnumerator EnemyDieCroutine()
-    {
-        battleInfo.text = string.Format("{0}의 공격으로 {1}이 쓰러졌습니다.", players[myTurn].name, targetEnemy.name);
-       // Destroy(targetEnemy.gameObject);
-
-        yield return new WaitForSeconds(1f);
-
-    }
-
-    IEnumerator PlayerDieCroutine()
-    {
-        battleInfo.text = string.Format("{0}의 공격으로 {1}이 쓰러졌습니다.", enemys[myTurn].name, targetPlayer.name);
-        targetPlayer.gameObject.SetActive(false) ;
-        //Destroy(targetPlayer.gameObject);
-
-        yield return new WaitForSeconds(1f);
-
-    }
-
-    IEnumerator MainCorutine()
-    {
-        players = RealizePlayer();
-        enemys = RealizeEnemy();
-        battleInfo.text = string.Format("{0}의 공격 순서입니다.", players[myTurn].name);
-        yield return new WaitForSeconds(1f);
-        state = BattleState.select;
-
-    }
-    IEnumerator PlayerTurnChangeCroutine()
-    {
-        battleInfo.text = "플레이어의 공격이 끝났습니다. 턴을 넘깁니다";
-        yield return new WaitForSeconds(1f);
-        myTurn = 0;
-        trigger = false;
-        state = BattleState.select;
-        StateManager.instance.ChangeTurn(StateManager.BattleState.EnemyTurn);
-    }
-    IEnumerator PlayerChangeCroutine()
-    {
-        battleInfo.text = string.Format("{0}의 공격 순서입니다.", players[myTurn + 1].name);
-        yield return new WaitForSeconds(1f);
-        if (trigger)
+        if (Input.GetMouseButtonDown(0))
         {
-            myTurn++;
             trigger = false;
+            state = type;
         }
-        state = BattleState.main;
-    }
-    IEnumerator PlayerAttackCroutine()
-    {
-        battleInfo.text = string.Format("{0}를 공격해 {1}의 피해를 입혔습니다.", targetEnemy.name, players[myTurn].attackDamage);
-
-
-        yield return new WaitForSeconds(1f);
-    }
-    IEnumerator PlayerSelectCroutine()
-    {
-        targetEnemy = target.gameObject.GetComponent<EnemyManager>();
-        battleInfo.text = string.Format("공격 대상으로 {0}를 선택했습니다.", targetEnemy.name);
-        yield return new WaitForSeconds(1f);
-        state = BattleState.attack;
     }
 
-    IEnumerator EnemyTurnChangeCroutine()
-    {
-        battleInfo.text = "적의 공격이 끝났습니다. 턴을 넘깁니다";
-        yield return new WaitForSeconds(1f);
-        myTurn = 0;
-        trigger = false;
-        state = BattleState.main;
-        StateManager.instance.ChangeTurn(StateManager.BattleState.PlayerTurn);
-    }
-    IEnumerator EnemyChangeCroutine()
-    {
-        battleInfo.text = string.Format(" 적{0}의 공격 순서입니다.", enemys[myTurn + 1]);
-        yield return new WaitForSeconds(1f);
-        if (trigger)
-        {
-            myTurn++;
-            trigger = false;
-        }
-        state = BattleState.select;
-    }
-    IEnumerator EnemyAttackCroutine()
-    {
-        battleInfo.text = string.Format("적 {0}이 {1}를 공격해 {2}의 피해를 입혔습니다.", enemys[myTurn], targetPlayer.name, enemys[myTurn].attackDamage);
-        yield return new WaitForSeconds(1f);
-    }
-    IEnumerator EnemySelectCroutine()
-    {
-        targetPlayer = target.gameObject.GetComponent<PlayerManager>();
-
-        battleInfo.text = string.Format("적{0}이 공격 대상으로 {1}를 선택했습니다.",enemys[myTurn], targetPlayer.name);
-
-        yield return new WaitForSeconds(1f);
-        state = BattleState.attack;
-    }
     PlayerManager[] SelectPlayer()
     {
         //플레이어 배열 순서 변경(체력이 낮은 순)
@@ -303,21 +435,114 @@ public class BattleManager : MonoBehaviour
 
         return players;
     }
+    public void PlyerInfo()
+    {
+        Collider2D playerCol = MouseManager.instance.MouseRayCast("Player");
+        if (playerCol)
+        {
+            player = playerCol.gameObject.GetComponent<PlayerManager>();
+            PlayerInfoImage.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x + 360f,
+                Input.mousePosition.y, -Camera.main.transform.position.z));
+            PlayerInfoText.text = player.playerName + "\n" + "HP : " + player.currentHp + " / " + player.maxHp + "\n" + "Damage : " + player.attackDamage;
+            PlayerInfoImage.gameObject.SetActive(true);
+            player.transform.localScale = new Vector3(1.1f, 1.1f, 1f); 
+        }
+        else if(player)
+        {
+            player.transform.localScale = Vector3.one;
+
+            PlayerInfoImage.gameObject.SetActive(false);
+        }
+    }
+
+    public void ButtonInfo()
+    {
+
+        Collider2D AttackButtonCol = MouseManager.instance.MouseRayCast("AttackButtonInfo");
+        Collider2D SkillButtonCol = MouseManager.instance.MouseRayCast("SkillButtonInfo");
+        Collider2D HealButtonCol = MouseManager.instance.MouseRayCast("HealButtonInfo");
+
+        if (AttackButtonCol)
+        {
+            buttonsImage[0] = AttackButtonCol.GetComponent<Image>();
+            buttonsImage[0].transform.localScale = new Vector3(1.1f, 1.1f,1f);
+            if (buttonsImage[1])
+                buttonsImage[1].transform.localScale = Vector3.one;
+            if(buttonsImage[2])
+                buttonsImage[2].transform.localScale = Vector3.one;
+            buttonInfoImage.gameObject.SetActive(true);
+            buttonInfoText.text = string.Format("적 하나에게 {0}만큼\n 피해를 입힙니다", gameData[myTurn].playerAttackDamage);
+
+        }
+        else if (SkillButtonCol)
+        {
+            buttonsImage[1] = SkillButtonCol.GetComponent<Image>();
+            buttonsImage[1].transform.localScale = new Vector3(1.1f,1.1f,1f);
+            if(buttonsImage[0])
+                buttonsImage[0].transform.localScale = Vector3.one;
+            if(buttonsImage[2])
+                buttonsImage[2].transform.localScale = Vector3.one;
+
+            buttonInfoImage.gameObject.SetActive(true);
+            if (players[myTurn].playerName == "Wizard")
+                buttonInfoText.text = string.Format("10의 체력을 소모해 \n모든 적에게 {0}만큼\n 피해를 입힙니다", gameData[myTurn].playerAttackDamage);
+            else
+                buttonInfoText.text = string.Format("10의 체력을 소모해 \n적 하나에게 {0}만큼\n 피해를 입힙니다", gameData[myTurn].playerAttackDamage * 2f);
+
+        }
+        else if (HealButtonCol)
+        {
+            buttonsImage[2] = HealButtonCol.GetComponent<Image>();
+            buttonsImage[2].transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+            if (buttonsImage[0])
+                buttonsImage[0].transform.localScale = Vector3.one;
+            if (buttonsImage[1])
+                buttonsImage[1].transform.localScale = Vector3.one;
+
+
+            buttonInfoText.text = string.Format("{0}만큼 체력을\n 회복합니다", gameData[myTurn].skillDamage);
+            buttonInfoImage.gameObject.SetActive(true);
+        }
+        else if(buttonsImage[0] && buttonsImage[1] && buttonsImage[2])
+        {
+            buttonsImage[0].transform.localScale = Vector3.one;
+            buttonsImage[1].transform.localScale = Vector3.one;
+            buttonsImage[2].transform.localScale = Vector3.one;
+
+            buttonInfoImage.gameObject.SetActive(false);
+        }
+
+
+        buttonInfoImage.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x + 350f,
+                Input.mousePosition.y, -Camera.main.transform.position.z));
+    }
     public Collider2D SelectEnemy()
     {
-        Collider2D col;
+        Collider2D col = MouseManager.instance.MouseRayCast("Enemy");
 
-        if (col = MouseManager.instance.MouseRayCast("Enemy"))
+        if (col)
         {
-            enemySpriter = col.gameObject.GetComponent<SpriteRenderer>();
-            enemySpriter.color = new Color(0, 0, 0, 1);
+            enemy = col.gameObject.GetComponent<EnemyManager>();
+            EenmyInfoImage.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x - 360f,
+                Input.mousePosition.y, -Camera.main.transform.position.z));
+            EnemyInfoText.text = enemy.enemyName + "\n" + "HP : " + enemy.currentHp + " / " + enemy.maxHp + "\n" + "Damage : " + enemy.attackDamage;
+            EenmyInfoImage.gameObject.SetActive(true);
+            Cursor.SetCursor(cursurIcon, new Vector2(cursurIcon.width / 2f, cursurIcon.height / 2f), CursorMode.Auto);
+            enemy.transform.localScale = new Vector3(-1.1f, 1.1f, 1f);
         }
-        else if (enemySpriter != null)
-            enemySpriter.color = new Color(1, 1, 1, 1);
+        else if(enemy)
+        {
+            enemy.transform.localScale = new Vector3(-1f, 1f, 1f);
+            EenmyInfoImage.gameObject.SetActive(false);
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+
+        }
+
 
         if (Input.GetMouseButtonDown(0) && col != null)
         {
-            enemySpriter.color = new Color(1, 1, 1, 1);
+            EenmyInfoImage.gameObject.SetActive(false);
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             return col;
         }
         else
@@ -330,7 +555,7 @@ public class BattleManager : MonoBehaviour
 
         //플레이어 공격 순서 지정(숫자가 낮은 순)
         for (int i = 0; i < players.Length; i++)
-        {
+        {          
             if (i + 1 >= players.Length)
                 break;
 
@@ -343,6 +568,16 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+        if (players.Length < 2)
+            return players;
+
+        if (players[0].attackNumber > players[1].attackNumber)
+        {
+            PlayerManager save = new PlayerManager();
+            save = players[1];
+            players[1] = players[0];
+            players[0] = save;
+        }
         return players;
     }
 
@@ -369,4 +604,43 @@ public class BattleManager : MonoBehaviour
         return enemys;
     }
 
+    public void AttackClick()
+    {
+        buttonsParent.SetActive(false);
+        state = BattleState.targetselect;
+        arrowImage.gameObject.SetActive(false);
+       buttonInfoImage.gameObject.SetActive(false);
+
+    }
+
+    public void SkillClick()
+    {
+        switch(players[myTurn].playerName)
+        {
+            case "Wizard":
+                state = BattleState.allTargetSkill;
+                break;
+            case "Mini":
+            case "Miho":
+                state = BattleState.oneTargetSkill;
+                break;
+        }
+
+        buttonsParent.SetActive(false);
+
+        arrowImage.gameObject.SetActive(false);
+        buttonInfoImage.gameObject.SetActive(false);
+
+    }
+
+    public void HealClick()
+    {
+
+        buttonsParent.SetActive(false);
+
+        state = BattleState.Heal;
+        arrowImage.gameObject.SetActive(false);
+        buttonInfoImage.gameObject.SetActive(false);
+
+    }
 }
