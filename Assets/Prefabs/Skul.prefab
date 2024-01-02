@@ -200,7 +200,7 @@ MonoBehaviour:
   attackOrder: 5
   charName: 
   currentHp: 1
-  maxHp: 300
+  maxHp: 10
   attackDamage: 11
   speed: 10
   dir: {x: 0, y: 0, z: 0}
@@ -209,6 +209,7 @@ MonoBehaviour:
   SetDead: 0
   SetHeal: 0
   attackTrigger: 0
+  gameData: {fileID: 0}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}

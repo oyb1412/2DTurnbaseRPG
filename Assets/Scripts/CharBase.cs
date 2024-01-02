@@ -59,7 +59,10 @@ public class CharBase : MonoBehaviour
     {
         if (hpBar != null)
             hpBar.gameObject.SetActive(false);
+
+        Destroy(gameObject);
     }
+
 
     protected void craeteDustEffect(float pos)
     {
@@ -76,6 +79,7 @@ public class CharBase : MonoBehaviour
     private IEnumerator DeadAnimation()
     {
         animator.SetTrigger("Die");
+        Debug.Log("1");
         SetDead = false;
         yield return new WaitForSeconds(1f);
         gameObject.SetActive(false);

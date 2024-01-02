@@ -17,6 +17,9 @@ MonoBehaviour:
   playerCurrentHp: 400
   playerMaxHp: 400
   playerAttackDamage: 24
+  PlayerName: 
+  PlayerCurrendExp: 0
+  PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 0
   plusPlayerGold: 0

@@ -25,13 +25,13 @@ public class AssignManGER : MonoBehaviour
         for (int i = 0; i < playerNum; i++)
         {
             Transform trans = Instantiate(playerPrefabs[i]).transform;
-            trans.position = new Vector2(-6f, (-0.5f - i * 1.5f));
+            trans.position = new Vector2(-6f, (1f - i));
         }
 
         for (int i = 0; i < playerNum; i++)
         {
             Transform greedTrans = Instantiate(enemyPrefabs[i]).transform;
-            greedTrans.position = new Vector2(6f, (-0.5f - i * 1.5f));
+            greedTrans.position = new Vector2(6f, (1 - i));
         }
     }
 }

@@ -1559,6 +1559,7 @@ MonoBehaviour:
   SetDead: 0
   SetHeal: 0
   attackTrigger: 0
+  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
@@ -1568,4 +1569,3 @@ MonoBehaviour:
   - {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
   skillDamage: 0
   playerType: 0
-  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}

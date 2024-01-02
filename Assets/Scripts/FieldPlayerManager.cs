@@ -123,7 +123,7 @@ public class FieldPlayerManager : MonoBehaviour
             animator.SetBool("IsWalking", false);
             animator.SetTrigger("Idle");
         }
-        else if (moveDir.magnitude == 1)
+        else
         {
             animator.SetBool("IsWalking", true);
             animator.SetTrigger("Move");

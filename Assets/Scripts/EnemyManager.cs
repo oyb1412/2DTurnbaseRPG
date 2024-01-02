@@ -33,7 +33,7 @@ public class EnemyManager : CharBase
             animator.SetTrigger("Attack");
             Instantiate(effectPrefabs[0], player.transform);
 
-            if (player.currentHp <= 0)
+            if (player.gameData.playerCurrentHp <= 0)
                 player.SetDead = true;
             else
                 player.SetHit = true;
@@ -47,7 +47,6 @@ public class EnemyManager : CharBase
     {
         if (SetAttack)
         {
-
             if (!attackTrigger)
             {
                 if (transform.position.x >= 6)

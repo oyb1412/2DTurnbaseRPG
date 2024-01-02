@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGold: 0
   currentPlayerNumber: 1
-  playerCurrentHp: 300
+  playerCurrentHp: 0
   playerMaxHp: 300
   playerAttackDamage: 19
   PlayerName: Mini
+  PlayerCurrendExp: 55
+  PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 0
   plusPlayerGold: 0

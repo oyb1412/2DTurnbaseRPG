@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGold: 0
   currentPlayerNumber: 3
-  playerCurrentHp: 133
+  playerCurrentHp: -15
   playerMaxHp: 200
   playerAttackDamage: 14
   PlayerName: Wizard
+  PlayerCurrendExp: 77
+  PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 50
   plusPlayerGold: 300
