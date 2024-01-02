@@ -37,6 +37,9 @@ public class FieldEnemy : MonoBehaviour
         if (!FieldGameManager.Instance.isPlaying)
             return;
 
+
+
+        
         if (SceneManager.GetActiveScene().name != "FieldScene")
         {
             transform.localScale = new Vector3(0f,0f,0f);

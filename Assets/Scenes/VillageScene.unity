@@ -1400,9 +1400,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25df7416da2d9db4283b6e76a9a46566, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlaying: 0
   fadeImage: {fileID: 919543171}
   fadeTrigger: 0
-  isPlaying: 0
   fadeOn: 0
 --- !u!4 &931773814
 Transform:
@@ -1452,15 +1452,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
   - {fileID: 11400000, guid: 84cef539c50907949a84177b74a89be0, type: 2}
-  goldTexts:
-  - {fileID: 1071960887}
-  - {fileID: 850788279}
-  - {fileID: 468761576}
-  - {fileID: 860167972}
   itemButton:
   - {fileID: 159594893}
   - {fileID: 376476226}
   - {fileID: 773311084}
+  currentGoldText: {fileID: 860167972}
 --- !u!4 &937016142
 Transform:
   m_ObjectHideFlags: 0

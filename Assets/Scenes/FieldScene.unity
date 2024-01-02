@@ -4519,7 +4519,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &771455886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4951,15 +4951,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgm: 0
-  sfx: 0
   bgmClip:
   - {fileID: 8300000, guid: 0ad591428b0c18c4da51fe3bf98dbc63, type: 3}
   - {fileID: 8300000, guid: fc5af015011ea3745b7f78ea1dd1049f, type: 3}
   - {fileID: 8300000, guid: bef0cef2ded0f0645ad90c6e5bdd4965, type: 3}
   bgmVolume: 0.3
-  channels: 5
   sfxClips: []
   sfxVolume: 0
+  sfx: 0
 --- !u!4 &872776325
 Transform:
   m_ObjectHideFlags: 0
@@ -4992,7 +4991,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &872854534
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5758,11 +5757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35938157f3b9ff242a64f06827a6e14c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyCount: 0
-  enemyPrefabs:
-  - {fileID: 388509640285012925, guid: be0e94538b8f1e4458fe4394c8e9e6c6, type: 3}
-  - {fileID: 1866747074770886704, guid: 1a2bd329dbdef9347898f670d65aa82e, type: 3}
-  - {fileID: 8436464734700466619, guid: 0b4e29c0defb4c04ab87c700589494d2, type: 3}
+  enemyPrefabs: {fileID: 388509640285012925, guid: be0e94538b8f1e4458fe4394c8e9e6c6, type: 3}
 --- !u!4 &1035479604
 Transform:
   m_ObjectHideFlags: 0
@@ -6838,27 +6833,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1efd77e7c6df01d4cbd94ef50a54555a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isPlaying: 0
   scenes: 0
   fadeImage: {fileID: 614085961}
   fadeCount: 0
-  isPlaying: 0
   fadeOn: 0
-  currentPlyerNum: 0
-  colliderEnemyType: 2
-  gold: 0
   goldText: {fileID: 1726300716}
+  players: {fileID: 1887521786}
   gameData:
   - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
   - {fileID: 11400000, guid: 84cef539c50907949a84177b74a89be0, type: 2}
+  currentPlyerNum: 0
+  currentPlayerGold: 0
   player: {fileID: 677206677}
-  images:
-  - {fileID: 872854533}
-  - {fileID: 771455885}
-  texts:
-  - {fileID: 1131544738}
-  - {fileID: 327190167}
-  - {fileID: 1738727251}
 --- !u!4 &1557220279
 Transform:
   m_ObjectHideFlags: 0
@@ -25186,6 +25174,14 @@ PrefabInstance:
       propertyPath: dustPrefab
       value: 
       objectReference: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
+    - target: {fileID: 6505486695676719350, guid: 8485be9b8f9710241b6b767557ad4474, type: 3}
+      propertyPath: m_Mass
+      value: 0.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505486695676719350, guid: 8485be9b8f9710241b6b767557ad4474, type: 3}
+      propertyPath: m_Constraints
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8322815150097386062, guid: 8485be9b8f9710241b6b767557ad4474, type: 3}
     m_RemovedGameObjects: []

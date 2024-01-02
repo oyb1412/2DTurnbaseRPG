@@ -4,25 +4,36 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    [Header("--Instance--")]
     public static AudioManager instance;
-    public enum Bgm { Field,Battle,Village}
-    public enum Sfx { Walk,GoBattle,GoVillage,UseGold,ExitVillage,Select,StartTurn,MouseOn,WizardAttack,WizardSkill
-    ,MihoAttack,MihoSkill,Heal,Lose,Win}
+
+    [Header("--Bgm--")]
     public Bgm bgm;
-    public Sfx sfx;
     public AudioClip[] bgmClip;
     public float bgmVolume;
     AudioSource bgmPlayer;
-    public int channels =5;
+    public enum Bgm { Field,Battle,Village}
+
+    [Header("--Sfx--")]
+    int sfxChannels = 10;
     public AudioClip[] sfxClips;
     public float sfxVolume;
     AudioSource[] sfxPlayers;
+    public Sfx sfx;
+    public enum Sfx { Walk,GoBattle,GoVillage,UseGold,ExitVillage,Select,StartTurn,MouseOn,WizardAttack,WizardSkill
+    ,MihoAttack,MihoSkill,Heal,Lose,Win}
+
     // Start is called before the first frame update
     private void Awake()
     {
         DontDestroyOnLoad(this);
         instance = this;
-
+        InitBgm();
+        InitSfx();
+    }
+   
+    void InitBgm()
+    {
         GameObject bgmObject = new GameObject("BgmPlayer");
         bgmObject.transform.parent = transform;
         bgmPlayer = bgmObject.AddComponent<AudioSource>();
@@ -30,10 +41,13 @@ public class AudioManager : MonoBehaviour
         bgmPlayer.loop = true;
         bgmPlayer.volume = bgmVolume;
         bgmPlayer.clip = bgmClip[(int)Bgm.Field];
-        
+    }
+
+    void InitSfx()
+    {
         GameObject sfxObject = new GameObject("SfxPlayer");
         sfxObject.transform.parent = transform;
-        sfxPlayers = new AudioSource[channels];
+        sfxPlayers = new AudioSource[sfxChannels];
 
         for (int i = 0; i < sfxPlayers.Length; i++)
         {
@@ -43,8 +57,6 @@ public class AudioManager : MonoBehaviour
             sfxPlayers[i].bypassListenerEffects = true;
         }
     }
-   
-    
 
     public void PlayerBgm(Bgm bgm, bool islive)
     {

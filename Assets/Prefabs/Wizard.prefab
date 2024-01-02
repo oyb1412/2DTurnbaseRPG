@@ -1554,18 +1554,18 @@ MonoBehaviour:
   attackDamage: 0
   attackNumber: 1
   playerName: 
+  speed: 0
+  dir: {x: 0, y: 0, z: 0}
   SetAttack: 0
   SetHit: 0
   SetHeal: 0
   SetDead: 0
   attackTrigger: 0
-  speed: 0
-  hpBar: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
-  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   Idle: 0
+  hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   effectPrefabs:
   - {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
   - {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   - {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
   - {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
-  dir: {x: 0, y: 0, z: 0}

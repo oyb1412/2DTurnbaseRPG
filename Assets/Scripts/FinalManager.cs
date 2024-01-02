@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FinalManager : MonoBehaviour
 {
+    [Header("--GameData--")]
     public GameData[] gameDatas;
     // Start is called before the first frame update
     private void Awake()
@@ -13,9 +14,14 @@ public class FinalManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        DataInit();
+    }
+
+    void DataInit()
+    {
         for (int i = 0; i < 3; i++)
         {
-            gameDatas[i].currentPlayerNumber = gameDatas[i+3].currentPlayerNumber;
+            gameDatas[i].currentPlayerNumber = gameDatas[i + 3].currentPlayerNumber;
 
             gameDatas[i].currentGold = gameDatas[i + 3].currentGold;
             gameDatas[i].playerCurrentHp = gameDatas[i + 3].playerCurrentHp;

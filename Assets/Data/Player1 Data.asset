@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Player1 Data
   m_EditorClassIdentifier: 
   currentGold: 0
-  currentPlayerNumber: 3
-  playerCurrentHp: 523
+  currentPlayerNumber: 1
+  playerCurrentHp: 200
   playerMaxHp: 200
   playerAttackDamage: 14
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 50
   plusPlayerGold: 300
   playerLevel: 1
-  skillDamage: 50
+  skillDamage: 15

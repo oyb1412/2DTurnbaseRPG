@@ -8,13 +8,21 @@ using static PlayerManager;
 
 public class FieldPlayerManager : MonoBehaviour
 {
+    [Header("--Info--")]
     public float speed;
     public Vector2 moveDir;
     Rigidbody2D rigid;
+
+    [Header("--GameData--")]
     public GameData gameData;
-    public GameObject dustPrefab;
+
+    [Header("--Enemy--")]
     public FieldEnemy enemy;
+
+    [Header("--Effect--")]
+    public GameObject dustPrefab;
     float dustTimer;
+
     Animator animator;
     private void Awake()
     {
@@ -33,25 +41,7 @@ public class FieldPlayerManager : MonoBehaviour
         if (!FieldGameManager.Instance.isPlaying)
             return;
 
-        moveDir.x = Input.GetAxisRaw("Horizontal");
-        moveDir.y = Input.GetAxisRaw("Vertical");
-
-        if (moveDir.x > 0)
-            transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        if (moveDir.x < 0)
-            transform.localScale = new Vector3(-0.5f, 0.5f, 0.5f);
-
-
-        if (moveDir.magnitude == 0)
-        {
-            animator.SetBool("IsWalking", false);
-            animator.SetTrigger("Idle");
-        }
-        else if(moveDir.magnitude == 1)
-        {
-            animator.SetBool("IsWalking", true);
-            animator.SetTrigger("Move");
-        }
+        PlayerAnimation();
     }
 
     private void FixedUpdate()
@@ -64,25 +54,24 @@ public class FieldPlayerManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        dustTimer += Time.deltaTime;
-        if(moveDir.magnitude > 0 && dustTimer > 0.5f)
-        {
-            Transform effect = Instantiate(dustPrefab, transform).transform;
-            effect.transform.position = new Vector3(transform.position.x, transform.position.y - 0.2f, 0f);
+        if (!FieldGameManager.Instance.isPlaying)
+            return;
 
-            dustTimer = 0;
-        }
-        
-
+        CreateDustEffect();
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!FieldGameManager.Instance.isPlaying)
             return;
 
+        CollisionObject(collision);
+    }
+
+    void CollisionObject(Collision2D collision)
+    {
         if (collision.collider.CompareTag("FieldEnemy"))
         {
-            FieldGameManager.Instance.colliderEnemyType = collision.gameObject.GetComponent<FieldEnemy>().enemyType;
             enemy = collision.gameObject.GetComponent<FieldEnemy>();
             gameData.playerFieldPosition = transform.position;
 
@@ -101,8 +90,44 @@ public class FieldPlayerManager : MonoBehaviour
         }
     }
 
+    void CreateDustEffect()
+    {
+        dustTimer += Time.deltaTime;
+        if (moveDir.magnitude > 0 && dustTimer > 0.5f)
+        {
+            Transform effect = Instantiate(dustPrefab, transform).transform;
+            effect.transform.position = new Vector3(transform.position.x, transform.position.y - 0.2f, 0f);
+
+            dustTimer = 0;
+        }
+    }
+
     public FieldEnemy DestroyEnemy()
     {
         return enemy;
     }
+
+    void PlayerAnimation()
+    {
+        moveDir.x = Input.GetAxisRaw("Horizontal");
+        moveDir.y = Input.GetAxisRaw("Vertical");
+
+        if (moveDir.x > 0)
+            transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        if (moveDir.x < 0)
+            transform.localScale = new Vector3(-0.5f, 0.5f, 0.5f);
+
+
+        if (moveDir.magnitude == 0)
+        {
+            animator.SetBool("IsWalking", false);
+            animator.SetTrigger("Idle");
+        }
+        else if (moveDir.magnitude == 1)
+        {
+            animator.SetBool("IsWalking", true);
+            animator.SetTrigger("Move");
+        }
+    }
+
 }

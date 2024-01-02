@@ -4,17 +4,12 @@ using UnityEngine;
 
 public class MouseManager : MonoBehaviour
 {
+    [Header("--Instance--")]
     public static MouseManager instance;
     // Start is called before the first frame update
     private void Awake()
     {
         instance = this;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-   
     }
 
     public Collider2D MouseRayCast(string tag)

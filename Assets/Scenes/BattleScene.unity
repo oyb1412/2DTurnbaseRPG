@@ -2110,29 +2110,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eb160f1b4b488b4abd4213ed05308a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players: []
-  enemys: []
+  arrowImage: {fileID: 1360567896}
+  battleInfoImage: {fileID: 593592666}
   buttons:
   - {fileID: 924026673}
   - {fileID: 222686126}
   - {fileID: 415849652}
+  EenmyInfoImage: {fileID: 1831560347}
+  PlayerInfoImage: {fileID: 518667045}
+  cursurIcon: {fileID: 2800000, guid: f992a87707b46f140a5dade8c5fa36c3, type: 3}
+  buttonsParent: {fileID: 603218175}
+  buttonInfoImage: {fileID: 67232350}
+  buttonInfoText: {fileID: 0}
+  battleInfoText: {fileID: 0}
+  EnemyInfoText: {fileID: 0}
+  PlayerInfoText: {fileID: 0}
+  state: 0
   myTurn: 0
   deadCount: 0
   trigger: 0
-  state: 0
-  battleInfo: {fileID: 2069245715}
-  EenmyInfoImage: {fileID: 1831560347}
-  PlayerInfoImage: {fileID: 518667045}
-  arrowImage: {fileID: 1360567896}
-  textImage: {fileID: 593592666}
   gameData:
   - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
   - {fileID: 11400000, guid: 84cef539c50907949a84177b74a89be0, type: 2}
-  cursurIcon: {fileID: 2800000, guid: f992a87707b46f140a5dade8c5fa36c3, type: 3}
-  buttonsParent: {fileID: 603218175}
-  buttonInfoImage: {fileID: 67232350}
-  buttonInfoText: {fileID: 403227495}
 --- !u!1 &1710062588
 GameObject:
   m_ObjectHideFlags: 0
@@ -2511,7 +2511,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  turnText: {fileID: 1354584380}
   turnImage: {fileID: 1094908896}
   infoText: {fileID: 2069245715}
 --- !u!1 &2069245713

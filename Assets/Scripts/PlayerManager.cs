@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using static EnemyManager;
-using static UnityEditor.PlayerSettings;
 
 
 public class PlayerManager : MonoBehaviour
 {
-    public enum Player { Wizard, Mini, Miho }
+    [Header("--Info--")]
     public Player playerType;
     public float skillDamage;
     public float currentHp;
@@ -17,36 +15,56 @@ public class PlayerManager : MonoBehaviour
     public float attackDamage;
     public int attackNumber;
     public string playerName;
+    public float speed;
+    PlayerManager player;
+    public Vector3 dir;
+    public enum Player { Wizard, Mini, Miho }
+
+    [Header("--Animation--")]
     public bool SetAttack;
     public bool SetHit;
     public bool SetHeal;
     public bool SetDead;
     public bool attackTrigger;
     bool AnimationTrigger;
-    public float speed;
-    PlayerManager player;
-    public Slider hpBar;
-    Slider hpbar;
-    float dustTimer;
-    public GameData gameData;
     Animator animator;
     public bool Idle;
+
+    [Header("--UI--")]
+    public Slider hpBarPrefabs;
+    Slider hpbar;
+
+    [Header("--GameData--")]
+    public GameData gameData;
+
+    [Header("--Effect-")]
+    float dustTimer;
     public GameObject[] effectPrefabs;
-    public Vector3 dir;
     private void Awake()
     {
-        Idle = true;
-        animator = GetComponent<Animator>();
-        skillDamage = gameData.skillDamage;
-        currentHp = gameData.playerCurrentHp;
-        maxHp = gameData.playerMaxHp;
-        attackDamage = gameData.playerAttackDamage;
+        Init();
     }
     private void Start()
     {
+        StartInit();
+    }
+    private void Update()
+    {
+        AdjustAnimation();
+        hpbar.value = currentHp / maxHp;
+        ShowHpBar();
+    }
+    private void OnDisable()
+    {
+        if (hpbar != null)
+            hpbar.gameObject.SetActive(false);
+    }
+
+    void StartInit()
+    {
         playerName = playerType.ToString();
 
-        hpbar = Instantiate(hpBar, GameObject.Find("WorldCanvas").transform);
+        hpbar = Instantiate(hpBarPrefabs, GameObject.Find("WorldCanvas").transform);
 
         hpbar.transform.position = Camera.main.WorldToScreenPoint(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
         hpbar.gameObject.SetActive(false);
@@ -155,16 +173,22 @@ public class PlayerManager : MonoBehaviour
     
 
     }
-    private void Update()
+
+    void CreateDustEffect()
     {
         dustTimer += Time.deltaTime;
-        if(transform.position.x != -6 && dustTimer > 0.5f)
+        if (transform.position.x != -6 && dustTimer > 0.5f)
         {
             Transform effect = Instantiate(effectPrefabs[3], transform).transform;
             effect.transform.position = new Vector3(transform.position.x, transform.position.y - 0.2f, 0f);
 
             dustTimer = 0;
         }
+    }
+
+    void AdjustAnimation()
+    {
+        CreateDustEffect();
         if (SetDead)
         {
             StartCoroutine(DeadAnimation());
@@ -175,27 +199,29 @@ public class PlayerManager : MonoBehaviour
             animator.SetTrigger("Idle");
         }
 
-        if(SetHit)
+        if (SetHit)
         {
             animator.SetTrigger("Spell");
             SetHit = false;
         }
 
-        if(SetHeal)
+        if (SetHeal)
         {
             animator.SetTrigger("Attack");
             SetHeal = false;
         }
-        hpbar.value = currentHp / maxHp;
-        OpenHpBar();
     }
-    private void OnDisable()
+    void Init()
     {
-        if(hpbar != null)
-        hpbar.gameObject.SetActive(false);
+        Idle = true;
+        animator = GetComponent<Animator>();
+        skillDamage = gameData.skillDamage;
+        currentHp = gameData.playerCurrentHp;
+        maxHp = gameData.playerMaxHp;
+        attackDamage = gameData.playerAttackDamage;
     }
 
-    void OpenHpBar()
+    void ShowHpBar()
     {
         Collider2D Col = MouseManager.instance.MouseRayCast("Player");
         if (Col)

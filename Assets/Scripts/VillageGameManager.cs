@@ -10,10 +10,13 @@ public class VillageGameManager : MonoBehaviour
 {
     public enum Scenes { FieldScene, BattleScene, VillageScene }
 
+    [Header("--Instance--")]
     public static VillageGameManager instance;
+    public bool isPlaying;
+
+    [Header("--UI--")]
     public Image fadeImage;
     public bool fadeTrigger;
-    public bool isPlaying;
     float fadeCount;
     public bool fadeOn;
     int nextScene;
@@ -31,6 +34,10 @@ public class VillageGameManager : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        AdjustFade();
+    }
+    void AdjustFade()
     {
         if (!fadeOn)
         {
@@ -59,7 +66,6 @@ public class VillageGameManager : MonoBehaviour
             }
         }
     }
-
     public void ActionFade(int scene)
     {
         isPlaying = false;

@@ -282,19 +282,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b95511fa437be614e9e0d30a3461f6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 2
-  attackNumber: 3
+  SetAttack: 0
+  SetHit: 0
+  SetDead: 0
+  attackTrigger: 0
+  hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  attackOrder: 0
   enemyName: 
   currentHp: 150
   maxHp: 1
   attackDamage: 20
-  hpBar: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
-  SetAttack: 0
-  SetHit: 0
-  SetDead: 0
-  speed: 10
-  attackTrigger: 0
+  moveSpeed: 10
   dir: {x: 0, y: 0, z: 0}
+  enemyType: 2
   AttackPrefabs: {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
 --- !u!1 &1425571381496845170

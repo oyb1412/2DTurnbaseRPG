@@ -6,15 +6,21 @@ using UnityEngine.UI;
 
 public class AssignManGER : MonoBehaviour
 {
+    [Header("--Prefabs--")]
     public GameObject[] playerPrefabs;
     public GameObject[] enemyPrefabs;
+
+    [Header("--GameData--")]
     public GameData gameData;
 
     private void Awake()
     {
+        AssignCharObject();
+    }
 
+    void AssignCharObject()
+    {
         int playerNum = gameData.currentPlayerNumber;
-        int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
 
         for (int i = 0; i < playerNum; i++)
         {
@@ -24,8 +30,8 @@ public class AssignManGER : MonoBehaviour
 
         for (int i = 0; i < playerNum; i++)
         {
-             Transform greedTrans = Instantiate(enemyPrefabs[i]).transform;
-             greedTrans.position = new Vector2(6f, (-0.5f - i * 1.5f));
+            Transform greedTrans = Instantiate(enemyPrefabs[i]).transform;
+            greedTrans.position = new Vector2(6f, (-0.5f - i * 1.5f));
         }
     }
 }
