@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGold: 0
   currentPlayerNumber: 1
-  playerCurrentHp: 240
+  playerCurrentHp: 400
   playerMaxHp: 400
   playerAttackDamage: 24
+  PlayerName: Miho
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 0
   plusPlayerGold: 0
   playerLevel: 1
-  skillDamage: 30
+  skillDamage: 10

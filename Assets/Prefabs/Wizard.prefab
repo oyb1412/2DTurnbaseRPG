@@ -1547,25 +1547,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5825c4765b936b1428ca86f7f510b0aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerType: 0
-  skillDamage: 0
+  attackOrder: 6
+  charName: 
   currentHp: 0
   maxHp: 0
   attackDamage: 0
-  attackNumber: 1
-  playerName: 
   speed: 0
   dir: {x: 0, y: 0, z: 0}
   SetAttack: 0
   SetHit: 0
-  SetHeal: 0
   SetDead: 0
+  SetHeal: 0
   attackTrigger: 0
-  Idle: 0
+  hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
-  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
+  dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
   - {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   - {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
-  - {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
+  skillDamage: 0
+  playerType: 0
+  gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}

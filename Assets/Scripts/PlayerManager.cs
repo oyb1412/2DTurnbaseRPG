@@ -5,70 +5,44 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : CharBase
 {
     [Header("--Info--")]
-    public Player playerType;
-    public float skillDamage;
-    public float currentHp;
-    public float maxHp;
-    public float attackDamage;
-    public int attackNumber;
-    public string playerName;
-    public float speed;
-    PlayerManager player;
-    public Vector3 dir;
-    public enum Player { Wizard, Mini, Miho }
+    public float skillDamage;//고정
 
-    [Header("--Animation--")]
-    public bool SetAttack;
-    public bool SetHit;
-    public bool SetHeal;
-    public bool SetDead;
-    public bool attackTrigger;
-    bool AnimationTrigger;
-    Animator animator;
-    public bool Idle;
 
-    [Header("--UI--")]
-    public Slider hpBarPrefabs;
-    Slider hpbar;
+    public enum Player { Wizard, Mini, Miho }//고정
+    public Player playerType;//고정
 
-    [Header("--GameData--")]
-    public GameData gameData;
 
-    [Header("--Effect-")]
-    float dustTimer;
-    public GameObject[] effectPrefabs;
-    private void Awake()
+
+
+ 
+    protected override void Awake()
     {
+        base.Awake();
         Init();
-    }
-    private void Start()
-    {
-        StartInit();
-    }
-    private void Update()
-    {
-        AdjustAnimation();
-        hpbar.value = currentHp / maxHp;
-        ShowHpBar();
-    }
-    private void OnDisable()
-    {
-        if (hpbar != null)
-            hpbar.gameObject.SetActive(false);
+        charName = playerType.ToString();
     }
 
-    void StartInit()
+    protected override void Update()
     {
-        playerName = playerType.ToString();
+        base.Update();
+        base.craeteDustEffect(-6f);
 
-        hpbar = Instantiate(hpBarPrefabs, GameObject.Find("WorldCanvas").transform);
+        base.ShowHpBar(MouseManager.instance.MouseRayCast("Player"));//다른자식과 다른내용의 함수
 
-        hpbar.transform.position = Camera.main.WorldToScreenPoint(new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z));
-        hpbar.gameObject.SetActive(false);
+        if (base.SetHeal)
+        {
+            base.animator.SetTrigger("Attack");
+            base.SetHeal = false;
+        }
+        hpBar.value = gameData.playerCurrentHp / gameData.playerMaxHp;
+
     }
+
+
+
     IEnumerator AttackAnimation(EnemyManager enemy, int effectnum)
     {
         if (!AnimationTrigger)
@@ -86,7 +60,7 @@ public class PlayerManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
-    public void AllTargetAttack(EnemyManager[] enemy, int effectnum) 
+    public override void AllTargetAttack(EnemyManager[] enemy, int effectnum) 
     {
         if (SetAttack)
         {
@@ -102,13 +76,13 @@ public class PlayerManager : MonoBehaviour
 
             }
             animator.SetTrigger("Fire");
-            SetEffect(enemy[1].transform, effectnum);
+            SetEffect(enemy[0].transform, effectnum);
         }
 
         SetAttack = false;
 
     }
-    public void Attack(EnemyManager enemy, int effectnum)
+    public override void Attack(EnemyManager enemy, int effectnum)
     {
         switch (playerType)
         {
@@ -173,73 +147,17 @@ public class PlayerManager : MonoBehaviour
     
 
     }
-
-    void CreateDustEffect()
+  
+    protected override void Init()
     {
-        dustTimer += Time.deltaTime;
-        if (transform.position.x != -6 && dustTimer > 0.5f)
-        {
-            Transform effect = Instantiate(effectPrefabs[3], transform).transform;
-            effect.transform.position = new Vector3(transform.position.x, transform.position.y - 0.2f, 0f);
-
-            dustTimer = 0;
-        }
-    }
-
-    void AdjustAnimation()
-    {
-        CreateDustEffect();
-        if (SetDead)
-        {
-            StartCoroutine(DeadAnimation());
-        }
-
-        if (!SetAttack)
-        {
-            animator.SetTrigger("Idle");
-        }
-
-        if (SetHit)
-        {
-            animator.SetTrigger("Spell");
-            SetHit = false;
-        }
-
-        if (SetHeal)
-        {
-            animator.SetTrigger("Attack");
-            SetHeal = false;
-        }
-    }
-    void Init()
-    {
-        Idle = true;
-        animator = GetComponent<Animator>();
         skillDamage = gameData.skillDamage;
         currentHp = gameData.playerCurrentHp;
         maxHp = gameData.playerMaxHp;
         attackDamage = gameData.playerAttackDamage;
     }
 
-    void ShowHpBar()
-    {
-        Collider2D Col = MouseManager.instance.MouseRayCast("Player");
-        if (Col)
-        {
-            player = Col.gameObject.GetComponent<PlayerManager>();
-            player.hpbar.gameObject.SetActive(true);
-        }
-        else if (player != null)
-            player.hpbar.gameObject.SetActive(false);
 
-    }
-    IEnumerator DeadAnimation()
-    {
-        animator.SetTrigger("Die");
-        SetDead = false;
-        yield return new WaitForSeconds(1f);
-        gameObject.SetActive(false);
-    }
+
     public void SetEffect(Transform pos, int effectnum)
     {
         Instantiate(effectPrefabs[effectnum], pos);

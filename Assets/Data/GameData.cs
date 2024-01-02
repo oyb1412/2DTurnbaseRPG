@@ -10,6 +10,7 @@ public class GameData : ScriptableObject
     public float playerCurrentHp;
     public float playerMaxHp;
     public float playerAttackDamage;
+    public string PlayerName;
     public Vector2 playerFieldPosition;
     public int levelUseGold;
     public int plusPlayerGold;

@@ -2511,8 +2511,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  turnImage: {fileID: 1094908896}
-  infoText: {fileID: 2069245715}
 --- !u!1 &2069245713
 GameObject:
   m_ObjectHideFlags: 0
