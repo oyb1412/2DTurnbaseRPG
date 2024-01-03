@@ -1565,8 +1565,8 @@ MonoBehaviour:
   damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
-  - {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
-  - {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
-  - {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
+  - {fileID: 1354241482965848852, guid: 55a6bd30d183b354a8765c3239d569c0, type: 3}
+  - {fileID: 3026081668111192717, guid: 2946f327263d3834b9bb4105cd9b72c6, type: 3}
+  - {fileID: 2139001444427623641, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
   skillDamage: 0
   playerType: 0

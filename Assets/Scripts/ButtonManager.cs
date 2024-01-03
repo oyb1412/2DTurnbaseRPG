@@ -22,7 +22,7 @@ public class ButtonManager : MonoBehaviour
         {
             needGoldTexts[i] = itemButton[i].GetComponentsInChildren<Text>()[1];
         }
-        needGoldTexts[0].text = string.Format("{0}°ñµå ÇÊ¿ä", 100);
+        needGoldTexts[0].text = string.Format("need {0} gold", 100);
     }
     public void MaxHpClick()
     {
@@ -76,8 +76,8 @@ public class ButtonManager : MonoBehaviour
 
     void ButtonText()
     {
-        needGoldTexts[1].text = string.Format("{0}°ñµå ÇÊ¿ä", gameDatas[0].levelUseGold);
-        needGoldTexts[2].text = string.Format("{0}°ñµå ÇÊ¿ä", gameDatas[0].plusPlayerGold);
+        needGoldTexts[1].text = string.Format("need {0} gold", gameDatas[0].levelUseGold);
+        needGoldTexts[2].text = string.Format("need {0} gold", gameDatas[0].plusPlayerGold);
         currentGoldText.text = gameDatas[0].currentGold.ToString();
     }
 

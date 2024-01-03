@@ -83,7 +83,7 @@ public class BattleManager : MonoBehaviour
                 case StateManager.BattleState.StartTurn:
 
                 chars = RealizeChar();
-                battleInfoText.text = string.Format("공격속도가 가장 빠른 {0}부터 공격합니다", chars[0].charName);
+                battleInfoText.text = string.Format("{0}'s Turn", chars[0].charName);
                 if (Input.GetMouseButtonDown(0))
                 {
                     state = BattleState.main;
@@ -108,11 +108,11 @@ public class BattleManager : MonoBehaviour
                                 break;
                             }
                         }
-                        battleInfoText.text = string.Format("{0}의 공격 순서입니다.", chars[myTurn].charName);
+                        battleInfoText.text = string.Format("{0}'s Turn", chars[myTurn].charName);
                         ChangeState(BattleState.skillselect);
                         break;
                     case BattleState.skillselect:
-                        battleInfoText.text = "행동을 선택하세요.";
+                        battleInfoText.text = "Select Your Action";
                         ButtonInfo();
                         if (gameData[currentPlayerNumber].playerCurrenMp < 10)
                         {
@@ -130,7 +130,7 @@ public class BattleManager : MonoBehaviour
 
                         break;
                     case BattleState.SkillList:
-                        battleInfoText.text = "스킬을 선택하세요. 마우스 우클릭으로 되돌아갑니다.";
+                        battleInfoText.text = "Select Your Skill";
                         SkillButtonInfo();
                         skillButtons.transform.position = new Vector3(chars[myTurn].transform.position.x + 3.5f,
                             chars[myTurn].transform.position.y + 1.5f,
@@ -142,12 +142,12 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.allTargetSkill:
-                        battleInfoText.text = "마나를 10 소모해 모든 적에게 \n피해를 입힙니다.";
+                        battleInfoText.text = string.Format("MP -10 {0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage);
                         ChangeState(BattleState.allTargetSkillAttack);
 
                         break;
                     case BattleState.oneTargetSkill:
-                        battleInfoText.text = "마나를 10 소모해 강한 공격을 가합니다. \n공격 대상을 선택하세요.";
+                        battleInfoText.text = string.Format("MP -10 {0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage * 2);
                         target = SelectEnemy();
                         if (target != null)
                         {
@@ -156,11 +156,11 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.Heal:
-                        battleInfoText.text = "마나를 10 소모해\n 스스로를 치유합니다";
+                        battleInfoText.text = string.Format("MP -10 {0} HP Self Healing", gameData[currentPlayerNumber].skillDamage);
                         ChangeState(BattleState.useHeal);
                         break;
                     case BattleState.allTargetSkillAttack:
-                        battleInfoText.text = string.Format("모든 적에게 {0}만큼의 피해를 입힙니다.", gameData[currentPlayerNumber].playerAttackDamage);
+                        battleInfoText.text = string.Format("{0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage);
 
                         if (!trigger)
                         {
@@ -191,14 +191,14 @@ public class BattleManager : MonoBehaviour
                             chars = chars.Where(x => null != x).ToArray(); //null 배열만 지움
 
 
-                            battleInfoText.text = string.Format("{0}의 스킬 공격으로 적이 쓰러졌습니다.", chars[myTurn].charName);
+                            battleInfoText.text = string.Format("Enemy Dead a {0}'s Attack", chars[myTurn].charName);
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
                                 state = BattleState.changePlayer;
                             }
                             else
                             {
-                                battleInfoText.text = "전투에서 승리했습니다!";
+                                battleInfoText.text = "Win!!!";
                                 int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
                                 switch (enemyType)
                                 {
@@ -224,7 +224,7 @@ public class BattleManager : MonoBehaviour
                         
                         break;
                     case BattleState.oneTargetSkillAttack:
-                        battleInfoText.text = string.Format("적 {0}에게 {1}만큼의 피해를 입힙니다.", targetEnemy.charName, chars[myTurn].attackDamage * 2f);
+                        battleInfoText.text = string.Format("{0} Damage to {1}", chars[myTurn].attackDamage * 2f, targetEnemy.charName);
 
                         if (!trigger)
                         {
@@ -242,7 +242,7 @@ public class BattleManager : MonoBehaviour
                         {
                             gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetHeal = true;
-                            battleInfoText.text = string.Format("{0}의 체력을 회복했습니다.", (gameData[currentPlayerNumber].skillDamage));
+                            battleInfoText.text = string.Format("{0} HP Recovery", (gameData[currentPlayerNumber].skillDamage));
 
                             gameData[currentPlayerNumber].playerCurrentHp += gameData[currentPlayerNumber].skillDamage;
                             if (gameData[currentPlayerNumber].playerCurrentHp >= gameData[currentPlayerNumber].playerMaxHp)
@@ -250,14 +250,14 @@ public class BattleManager : MonoBehaviour
 
                                 Transform effect = Instantiate(chars[myTurn].effectPrefabs[2], chars[myTurn].transform).transform;
                             effect.transform.position = new Vector3(chars[myTurn].transform.position.x,
-                                chars[myTurn].transform.position.y-0.5f,
+                                chars[myTurn].transform.position.y+0.5f,
                                 chars[myTurn].transform.position.z);
                             trigger = true;
                         }
                         ChangeState(BattleState.changePlayer);
                         break;
                     case BattleState.targetselect:
-                        battleInfoText.text = "대상을 선택하세요.";
+                        battleInfoText.text = "Select a Target";
 
                         PlyerInfo();
                         target = SelectEnemy();
@@ -268,7 +268,7 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.attack:
-                        battleInfoText.text = string.Format("{0}의 피해를 입혔습니다.",gameData[currentPlayerNumber].playerAttackDamage);
+                        battleInfoText.text = string.Format("{0} Damage to {1}", gameData[currentPlayerNumber].playerAttackDamage, targetEnemy.charName);
 
                         if(!trigger)
                         {
@@ -288,13 +288,12 @@ public class BattleManager : MonoBehaviour
                         {
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
-                                battleInfoText.text = "적을 쓰러뜨렸지만, \n살아있는 적이 존재하므로 전투를 지속합니다.";
                                 chars = chars.Where(x => null != x).ToArray(); 
-                                ChangeState(BattleState.changePlayer);
+                                state = BattleState.changePlayer;
                             }
                             else
                             {
-                                battleInfoText.text = "전투에서 승리했습니다!";
+                                battleInfoText.text = "Win!!!";
 
                                 int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
                                 switch (enemyType)
@@ -339,7 +338,7 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.Win:
-                        battleInfoText.text = string.Format("{0}골드를 보상으로 획득했습니다!\n{1}의 경험치를 획득했습니다", gold * gameData[0].currentPlayerNumber, gold + 10);
+                        battleInfoText.text = string.Format("Get {0} Gold! Get {1} Exp!", gold * gameData[0].currentPlayerNumber, gold + 10);
  
                         if (Input.GetMouseButtonDown(0))
                         {
@@ -357,7 +356,7 @@ public class BattleManager : MonoBehaviour
                             //공격 후 다음순번 캬랴 선택
                             if (chars.Length > myTurn + 1)
                             {
-                                battleInfoText.text = string.Format("{0}에게 턴이 넘어갑니다.", chars[myTurn + 1].charName);
+                                battleInfoText.text = string.Format("Next Turn {0}'s", chars[myTurn + 1].charName);
                             //다음순번 캬라가 적이면 currentstate 바꾸기
                             if (chars[myTurn+1].GetComponent<EnemyManager>())
                                 {
@@ -387,7 +386,7 @@ public class BattleManager : MonoBehaviour
                     case BattleState.main:
                         players = RealizePlayer();
                         enemys = RealizeEnemy();
-                        battleInfoText.text = string.Format("{0}의 공격 순서입니다.", chars[myTurn].charName);
+                        battleInfoText.text = string.Format("{0}'s Turn", chars[myTurn].charName);
                         ChangeState(BattleState.targetselect);
                         break;
                     case BattleState.targetselect:
@@ -397,12 +396,12 @@ public class BattleManager : MonoBehaviour
                         if (target != null)
                         {
                             targetPlayer = target.gameObject.GetComponent<PlayerManager>();
-                            battleInfoText.text = string.Format("적{0}가 공격 대상으로 {1}를 선택했습니다.", chars[myTurn].charName, targetPlayer.charName);
+                            battleInfoText.text = string.Format("{0} Select {1}", chars[myTurn].charName, targetPlayer.charName);
                             ChangeState(BattleState.attack);
                         }
                         break;
                     case BattleState.attack:
-                        battleInfoText.text = string.Format("{0}가 공격받아 {1}의 피해를 입었습니다.", targetPlayer.charName, chars[myTurn].attackDamage);
+                        battleInfoText.text = string.Format("{0}'s got {1} Damage", targetPlayer.charName, chars[myTurn].attackDamage);
 
                         if (!trigger)
                         {
@@ -419,7 +418,7 @@ public class BattleManager : MonoBehaviour
                         {
                             chars = chars.Where(x => null != x).ToArray(); //null 배열만 지움
 
-                            battleInfoText.text = string.Format("{0}의 공격으로 {1}가 쓰러졌습니다.", chars[myTurn].charName, targetPlayer.charName);
+                            battleInfoText.text = string.Format("{0}'s Attack {1}'s Dead", chars[myTurn].charName, targetPlayer.charName);
                             if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                             {
                                 state = BattleState.changePlayer;
@@ -428,7 +427,7 @@ public class BattleManager : MonoBehaviour
                             }
                             else
                             {
-                                battleInfoText.text = "전투에서 패배했습니다...";
+                                battleInfoText.text = "Lose...";
                                 ChangeState(BattleState.Lose);
 
                               
@@ -443,7 +442,7 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.Lose:
-                        battleInfoText.text = "전투 패배로 100 골드를 잃었습니다.\n" + "가까운 마을로 이동합니다.";
+                        battleInfoText.text = "Lost 100 Gold...";
                         if (Input.GetMouseButtonDown(0))
                         {
                             if(gameData[0].currentGold > 100)
@@ -472,7 +471,7 @@ public class BattleManager : MonoBehaviour
                         //공격 후 다음순번 플레이어 선택
                         if (chars.Length > myTurn + 1)
                         {
-                            battleInfoText.text = string.Format("{0}에게 턴이 넘어갑니다.", chars[myTurn + 1].charName);
+                            battleInfoText.text = string.Format("Next Turn {0}'s", chars[myTurn + 1].charName);
                             if (chars[myTurn + 1].GetComponent<EnemyManager>())
                             {
                                 if (Input.GetMouseButtonDown(0))
@@ -574,7 +573,7 @@ public class BattleManager : MonoBehaviour
             if (buttonsImage[1])
                 buttonsImage[1].transform.localScale = Vector3.one;
             buttonInfoImage.gameObject.SetActive(true);
-            buttonInfoText.text = string.Format("적 하나에게 {0}만큼\n 피해를 입힙니다", gameData[currentPlayerNumber].playerAttackDamage);
+            buttonInfoText.text = string.Format("{0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage);
 
         }
         else if (SkillButtonCol)
@@ -585,7 +584,7 @@ public class BattleManager : MonoBehaviour
                 buttonsImage[0].transform.localScale = Vector3.one;
 
             buttonInfoImage.gameObject.SetActive(true);
-                buttonInfoText.text = "스킬 목록을 엽니다.";
+                buttonInfoText.text = "Open the SkillList";
 
         }
         else if(buttonsImage[0] && buttonsImage[1] )
@@ -617,7 +616,7 @@ public class BattleManager : MonoBehaviour
             if (skillButtonsImages[2])
                 skillButtonsImages[2].transform.localScale = Vector3.one;
             buttonInfoImage.gameObject.SetActive(true);
-            buttonInfoText.text = string.Format("마나를 10 소모해 적 한명에게\n강한 공격을 가합니다");
+            buttonInfoText.text = string.Format("MP -10\n {0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage * 2);
 
         }
         else if (Skill2ButtonCol)
@@ -630,7 +629,7 @@ public class BattleManager : MonoBehaviour
                 skillButtonsImages[2].transform.localScale = Vector3.one;
 
             buttonInfoImage.gameObject.SetActive(true);
-                buttonInfoText.text = string.Format("마나를 10 소모해 모든 적을 공격합니다");
+                buttonInfoText.text = string.Format("MP -10\n {0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage);
 
         }
         else if (Skill3ButtonCol)
@@ -643,7 +642,7 @@ public class BattleManager : MonoBehaviour
                 skillButtonsImages[1].transform.localScale = Vector3.one;
 
 
-            buttonInfoText.text = string.Format("마나를 10 소모해 스스로를 치유합니다");
+            buttonInfoText.text = string.Format("MP -10\n {0} HP Self Healing", gameData[currentPlayerNumber].skillDamage);
             buttonInfoImage.gameObject.SetActive(true);
         }
         else if (skillButtonsImages[0] && skillButtonsImages[1] && skillButtonsImages[2])

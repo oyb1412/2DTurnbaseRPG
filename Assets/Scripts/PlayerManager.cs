@@ -66,7 +66,7 @@ public class PlayerManager : CharBase
         if (!AnimationTrigger)
         {
             animator.SetTrigger("Attack");
-            SetEffect(enemy[Mathf.Max(0,1)].transform, effectnum);
+            SetEffect(enemy[0].transform, effectnum);
             for(int i = 0; i < enemy.Length; i++)
             {
                 base.CreateDamage(enemy[i], gameData.playerAttackDamage);
@@ -113,7 +113,7 @@ public class PlayerManager : CharBase
                     if (!attackTrigger)
                     {
                         if (transform.position.x <= -6)
-                            dir = (enemy[Mathf.Max(0,1)].transform.position - transform.position).normalized;
+                            dir = (enemy[0].transform.position - transform.position).normalized;
 
                         if (transform.position.x < 5.5f)
                         {
