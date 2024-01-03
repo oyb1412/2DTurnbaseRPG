@@ -197,11 +197,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b95511fa437be614e9e0d30a3461f6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackOrder: 5
+  attackOrder: 1
   charName: 
   currentHp: 1
-  maxHp: 10
-  attackDamage: 11
+  maxHp: 500
+  attackDamage: 8
   speed: 10
   dir: {x: 0, y: 0, z: 0}
   SetAttack: 0
@@ -212,6 +212,7 @@ MonoBehaviour:
   gameData: {fileID: 0}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}

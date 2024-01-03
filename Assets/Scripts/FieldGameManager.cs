@@ -24,7 +24,7 @@ public class FieldGameManager : MonoBehaviour
     public GameObject players;
     Text[] playerLevelText;
     Image[] playerIconImage;
-
+    public Slider[,] PlayerIconSlider;
     [Header("--GameData--")]
     public GameData[] gameData;
 
@@ -35,6 +35,8 @@ public class FieldGameManager : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
+        Instance = this;
+
         Init();
     }
 
@@ -47,23 +49,58 @@ public class FieldGameManager : MonoBehaviour
     void Update()
     {
         adjustFade();
+
+        int count = 0;
+        for (int i = 0; i < gameData.Length; i++)
+        {
+            for (int j = 0; j < gameData.Length - 1; j++)
+            {
+                if (j == 0)
+                    PlayerIconSlider[i, j].value = gameData[count].playerCurrentHp / gameData[count].playerMaxHp;
+                else
+                    PlayerIconSlider[i, j].value = gameData[count].playerCurrenMp / gameData[count].playerMaxMp;
+
+            }
+            count++;
+
+        }
     }
     void Init()
     {
+        PlayerIconSlider = new Slider[gameData.Length, gameData.Length-1];
         playerLevelText = new Text[players.gameObject.transform.childCount];
         playerIconImage = new Image[players.gameObject.transform.childCount];
 
+        int count = 0;
+        for(int i = 0;i<gameData.Length;i++)
+        {
+            for(int j = 0; j < gameData.Length -1; j++)
+            {
+                PlayerIconSlider[i, j] = players.GetComponentsInChildren<Slider>()[count];
+                count++;
+
+            }
+
+        }
         playerLevelText = players.GetComponentsInChildren<Text>();
-        playerIconImage = players.GetComponentsInChildren<Image>();
+        count = 0;
+        for(int i = 0; i< playerIconImage.Length; i++)
+        {
+            playerIconImage[i] = players.GetComponentsInChildren<Image>()[count];
+            if (gameData[i].playerCurrentHp <= 0)
+                playerIconImage[i].color = Color.red;
+
+            count += 5;
+        }
+
         fadeImage.gameObject.SetActive(true);
         fadeCount = 1f;
         isPlaying = true;
-        Instance = this;
         currentPlyerNum = gameData[0].currentPlayerNumber;
         currentPlayerGold = gameData[0].currentGold;
         goldText.text = currentPlayerGold.ToString();
         for(int i = 0; i< players.gameObject.transform.childCount;i++)
-               playerLevelText[i].text = "Lv." + gameData[0].playerLevel;
+               playerLevelText[i].text = "Lv." + gameData[i].playerLevel;
 
         if (gameData[0].currentPlayerNumber == 1)
         {

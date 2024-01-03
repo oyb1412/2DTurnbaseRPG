@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.U2D.Aseprite;
 using UnityEngine;
+using static EnemyManager;
 
 public class EnemyManager : CharBase
 {
@@ -23,7 +24,6 @@ public class EnemyManager : CharBase
         base.craeteDustEffect(6f);
         base.ShowHpBar(MouseManager.instance.MouseRayCast("Enemy"));//다른자식과 다른내용의 함수
         hpBar.value = currentHp / maxHp;
-
     }
 
     IEnumerator MeleeAttackAnimation(PlayerManager player)
@@ -32,6 +32,8 @@ public class EnemyManager : CharBase
         {
             animator.SetTrigger("Attack");
             Instantiate(effectPrefabs[0], player.transform);
+            base.CreateDamage(player,attackDamage);
+            player.gameData.playerCurrentHp -= attackDamage;
 
             if (player.gameData.playerCurrentHp <= 0)
                 player.SetDead = true;

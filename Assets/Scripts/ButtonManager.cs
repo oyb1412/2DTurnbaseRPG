@@ -29,6 +29,8 @@ public class ButtonManager : MonoBehaviour
         for (int i = 0; i < gameDatas.Length; i++)
         {
             gameDatas[i].playerCurrentHp = gameDatas[i].playerMaxHp;
+            gameDatas[i].playerCurrenMp = gameDatas[i].playerMaxMp;
+
         }
         gameDatas[0].currentGold -= 100;
     }
@@ -42,10 +44,17 @@ public class ButtonManager : MonoBehaviour
     {
         for (int i = 0; i < gameDatas.Length; i++)
         {
-            gameDatas[i].playerLevel++;
-            gameDatas[i].playerAttackDamage += 2;
-            gameDatas[i].playerMaxHp += 10;
-            gameDatas[i].skillDamage += 1;
+            if (gameDatas[0].currentPlayerNumber > i)
+            {
+                if (gameDatas[i].playerCurrentHp > 0)
+                {
+                    gameDatas[i].playerLevel++;
+                    gameDatas[i].playerAttackDamage += 2;
+                    gameDatas[i].playerMaxHp += 10;
+                    gameDatas[i].playerMaxMp += 5;
+                    gameDatas[i].skillDamage += 3;
+                }
+            }
         }
         gameDatas[0].currentGold -= gameDatas[0].levelUseGold;
     }
@@ -76,14 +85,12 @@ public class ButtonManager : MonoBehaviour
     {
         if (gameDatas[0].playerCurrentHp == gameDatas[0].playerMaxHp &&
             gameDatas[1].playerCurrentHp == gameDatas[1].playerMaxHp &&
-            gameDatas[2].playerCurrentHp == gameDatas[2].playerMaxHp)
+            gameDatas[2].playerCurrentHp == gameDatas[2].playerMaxHp ||
+            gameDatas[0].currentGold < 100)
         {
             itemButton[0].interactable = false;
         }
-        if (gameDatas[0].currentGold < 100)
-        {
-            itemButton[0].interactable = false;
-        }
+
 
         if (gameDatas[0].currentGold < gameDatas[0].levelUseGold)
         {

@@ -16,8 +16,10 @@ MonoBehaviour:
   currentPlayerNumber: 1
   playerCurrentHp: 400
   playerMaxHp: 400
+  playerCurrenMp: 0
+  playerMaxMp: 0
   playerAttackDamage: 24
-  PlayerName: 
+  PlayerName: Miho
   PlayerCurrendExp: 0
   PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}

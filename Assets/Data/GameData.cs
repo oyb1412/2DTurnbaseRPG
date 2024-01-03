@@ -9,6 +9,8 @@ public class GameData : ScriptableObject
     public int currentPlayerNumber;
     public float playerCurrentHp;
     public float playerMaxHp;
+    public float playerCurrenMp;
+    public float playerMaxMp;
     public float playerAttackDamage;
     public string PlayerName;
     public float PlayerCurrendExp;

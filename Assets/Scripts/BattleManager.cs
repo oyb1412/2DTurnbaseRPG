@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,6 +19,8 @@ public class BattleManager : MonoBehaviour
     public CharBase[] chars;
 
     [Header("--UI--")]
+    public GameObject skillButtons;
+    Image[] skillButtonsImages;
     public Image arrowImage;
     public Image battleInfoImage;
     public Button[] buttons;
@@ -28,7 +31,7 @@ public class BattleManager : MonoBehaviour
     public Image buttonInfoImage;
     public Text buttonInfoText;
     public Text battleInfoText;
-    Image[] buttonsImage = new Image[3];
+    Image[] buttonsImage = new Image[2];
     public Text EnemyInfoText;
     public Text PlayerInfoText;
 
@@ -41,7 +44,7 @@ public class BattleManager : MonoBehaviour
     {
         main, skillselect, targetselect, attack, Check, changePlayer, Win, Lose,
         oneTargetSkill, allTargetSkill, Heal, allTargetSkillAttack, oneTargetSkillAttack, useHeal,
-        allTargetSkillCheck
+        allTargetSkillCheck,SkillList
     }
 
     [Header("--Info--")]
@@ -64,6 +67,9 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         Init();
+        skillButtonsImages = new Image[gameData.Length];
+        for (int i = 0; i < gameData.Length; i++)
+            skillButtonsImages[i] = skillButtons.GetComponentsInChildren<Image>()[i*2];
     }
 
     // Update is called once per frame
@@ -108,7 +114,7 @@ public class BattleManager : MonoBehaviour
                     case BattleState.skillselect:
                         battleInfoText.text = "행동을 선택하세요.";
                         ButtonInfo();
-                        if (gameData[currentPlayerNumber].playerCurrentHp < 10)
+                        if (gameData[currentPlayerNumber].playerCurrenMp < 10)
                         {
                             buttons[1].interactable = false;
                         }
@@ -116,19 +122,32 @@ public class BattleManager : MonoBehaviour
                         buttonsParent.gameObject.SetActive(true);
                         arrowImage.gameObject.SetActive(true);
 
-                        RectTransform rect = buttonsParent.transform.GetComponent<RectTransform>();
                         buttonsParent.transform.position = new Vector3(chars[myTurn].transform.position.x+3.5f,
                             chars[myTurn].transform.position.y+1.5f,
                             chars[myTurn].transform.position.z);
 
+
+
+                        break;
+                    case BattleState.SkillList:
+                        battleInfoText.text = "스킬을 선택하세요. 마우스 우클릭으로 되돌아갑니다.";
+                        SkillButtonInfo();
+                        skillButtons.transform.position = new Vector3(chars[myTurn].transform.position.x + 3.5f,
+                            chars[myTurn].transform.position.y + 1.5f,
+                            chars[myTurn].transform.position.z);
+
+                        if (Input.GetMouseButtonDown(1))
+                        {
+                            SkillReturn();
+                        }
                         break;
                     case BattleState.allTargetSkill:
-                        battleInfoText.text = "체력을 소모해 모든 적에게 피해를 입힙니다.";
+                        battleInfoText.text = "마나를 10 소모해 모든 적에게 \n피해를 입힙니다.";
                         ChangeState(BattleState.allTargetSkillAttack);
 
                         break;
                     case BattleState.oneTargetSkill:
-                        battleInfoText.text = "체력을 소모해 강한 공격을 가합니다. \n공격 대상을 선택하세요.";
+                        battleInfoText.text = "마나를 10 소모해 강한 공격을 가합니다. \n공격 대상을 선택하세요.";
                         target = SelectEnemy();
                         if (target != null)
                         {
@@ -137,7 +156,7 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.Heal:
-                        battleInfoText.text = "자가회복을 시도합니다.";
+                        battleInfoText.text = "마나를 10 소모해\n 스스로를 치유합니다";
                         ChangeState(BattleState.useHeal);
                         break;
                     case BattleState.allTargetSkillAttack:
@@ -145,7 +164,7 @@ public class BattleManager : MonoBehaviour
 
                         if (!trigger)
                         {
-                            gameData[currentPlayerNumber].playerCurrentHp -= 10;
+                            gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
@@ -175,8 +194,7 @@ public class BattleManager : MonoBehaviour
                             battleInfoText.text = string.Format("{0}의 스킬 공격으로 적이 쓰러졌습니다.", chars[myTurn].charName);
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
-                                chars = RealizeChar();
-                                ChangeState(BattleState.changePlayer);
+                                state = BattleState.changePlayer;
                             }
                             else
                             {
@@ -210,11 +228,11 @@ public class BattleManager : MonoBehaviour
 
                         if (!trigger)
                         {
-                            gameData[currentPlayerNumber].playerCurrentHp -= 10;
+                            gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].Attack(targetEnemy, 1);
+                        chars[myTurn].Attack(targetEnemy, 1, 2);
 
                         if (!chars[myTurn].SetAttack)
                             ChangeState(BattleState.Check);
@@ -222,10 +240,15 @@ public class BattleManager : MonoBehaviour
                     case BattleState.useHeal:
                         if (!trigger)
                         {
+                            gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetHeal = true;
                             battleInfoText.text = string.Format("{0}의 체력을 회복했습니다.", (gameData[currentPlayerNumber].skillDamage));
-                            gameData[currentPlayerNumber].playerCurrentHp += (gameData[currentPlayerNumber].skillDamage);
-                            Transform effect = Instantiate(chars[myTurn].effectPrefabs[2], chars[myTurn].transform).transform;
+
+                            gameData[currentPlayerNumber].playerCurrentHp += gameData[currentPlayerNumber].skillDamage;
+                            if (gameData[currentPlayerNumber].playerCurrentHp >= gameData[currentPlayerNumber].playerMaxHp)
+                                gameData[currentPlayerNumber].playerCurrentHp = gameData[currentPlayerNumber].playerMaxHp;
+
+                                Transform effect = Instantiate(chars[myTurn].effectPrefabs[2], chars[myTurn].transform).transform;
                             effect.transform.position = new Vector3(chars[myTurn].transform.position.x,
                                 chars[myTurn].transform.position.y-0.5f,
                                 chars[myTurn].transform.position.z);
@@ -253,7 +276,8 @@ public class BattleManager : MonoBehaviour
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].Attack(targetEnemy,0);
+                        chars[myTurn].Attack(targetEnemy,0, 1);
+                        
 
                         if (!chars[myTurn].SetAttack)
                             ChangeState(BattleState.Check);
@@ -265,7 +289,7 @@ public class BattleManager : MonoBehaviour
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
                                 battleInfoText.text = "적을 쓰러뜨렸지만, \n살아있는 적이 존재하므로 전투를 지속합니다.";
-                                chars = chars.Where(x => null != x).ToArray(); //null 배열만 지움
+                                chars = chars.Where(x => null != x).ToArray(); 
                                 ChangeState(BattleState.changePlayer);
                             }
                             else
@@ -285,7 +309,27 @@ public class BattleManager : MonoBehaviour
                                         gold = Random.Range(80, 100);
                                         break;
                                 }
-                                ChangeState(BattleState.Win);
+                                if (Input.GetMouseButtonDown(0))
+                                {
+                                    GameManager.instance.WinPanel(true);
+
+                                    gameData[0].currentGold = gameData[0].currentGold + (gold * gameData[0].currentPlayerNumber);
+                                    for (int i = 0; i < players.Length; i++)
+                                    {
+
+                                        gameData[i].PlayerCurrendExp += gold + 10;
+                                        if (gameData[i].PlayerCurrendExp >= gameData[i].PlayerMaxExp)
+                                        {
+                                            gameData[i].PlayerCurrendExp = 0;
+                                            gameData[i].playerLevel++;
+                                            gameData[i].playerAttackDamage += 2;
+                                            gameData[i].skillDamage += 2;
+
+                                        }
+                                    }
+                                    trigger = false;
+                                    state = BattleState.Win;
+                                }
 
                             }
                         }
@@ -295,13 +339,12 @@ public class BattleManager : MonoBehaviour
                         }
                         break;
                     case BattleState.Win:
-                        battleInfoText.text = string.Format("{0}골드를 보상으로 획득했습니다!", gold * gameData[0].currentPlayerNumber);
-                        
+                        battleInfoText.text = string.Format("{0}골드를 보상으로 획득했습니다!\n{1}의 경험치를 획득했습니다", gold * gameData[0].currentPlayerNumber, gold + 10);
+ 
                         if (Input.GetMouseButtonDown(0))
                         {
-                            gameData[0].currentGold = gameData[0].currentGold + (gold * gameData[0].currentPlayerNumber);
+                            GameManager.instance.WinPanel(false);
                             //AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, false);
-
                             GameManager.instance.ActionFade((int)GameManager.Scenes.FieldScene);
                         }
                         break;
@@ -363,7 +406,6 @@ public class BattleManager : MonoBehaviour
 
                         if (!trigger)
                         {
-                            targetPlayer.gameData.playerCurrentHp -= chars[myTurn].attackDamage;
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
@@ -380,14 +422,13 @@ public class BattleManager : MonoBehaviour
                             battleInfoText.text = string.Format("{0}의 공격으로 {1}가 쓰러졌습니다.", chars[myTurn].charName, targetPlayer.charName);
                             if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                             {
-                                chars = RealizeChar();
+                                state = BattleState.changePlayer;
 
-                                ChangeState(BattleState.changePlayer);
+
                             }
                             else
                             {
                                 battleInfoText.text = "전투에서 패배했습니다...";
-                                gold = Random.Range(30, 100);
                                 ChangeState(BattleState.Lose);
 
                               
@@ -397,6 +438,8 @@ public class BattleManager : MonoBehaviour
                         {
                             trigger = false;
                             state = BattleState.changePlayer;
+
+
                         }
                         break;
                     case BattleState.Lose:
@@ -411,8 +454,9 @@ public class BattleManager : MonoBehaviour
                             {
                                 gameData[0].currentGold = 0;
                             }
-                            for(int i = 0; i < players.Length; i++)
+                            for(int i = 0; i < gameData.Length; i++)
                             {
+                                gameData[i].PlayerCurrendExp = 0;
                                 gameData[i].playerCurrentHp = gameData[i].playerMaxHp;
                             }
                             gameData[0].playerFieldPosition = new Vector2(-9.3f, -9.5f);
@@ -522,7 +566,6 @@ public class BattleManager : MonoBehaviour
 
         Collider2D AttackButtonCol = MouseManager.instance.MouseRayCast("AttackButtonInfo");
         Collider2D SkillButtonCol = MouseManager.instance.MouseRayCast("SkillButtonInfo");
-        Collider2D HealButtonCol = MouseManager.instance.MouseRayCast("HealButtonInfo");
 
         if (AttackButtonCol)
         {
@@ -530,8 +573,6 @@ public class BattleManager : MonoBehaviour
             buttonsImage[0].transform.localScale = new Vector3(1.1f, 1.1f,1f);
             if (buttonsImage[1])
                 buttonsImage[1].transform.localScale = Vector3.one;
-            if(buttonsImage[2])
-                buttonsImage[2].transform.localScale = Vector3.one;
             buttonInfoImage.gameObject.SetActive(true);
             buttonInfoText.text = string.Format("적 하나에게 {0}만큼\n 피해를 입힙니다", gameData[currentPlayerNumber].playerAttackDamage);
 
@@ -542,34 +583,15 @@ public class BattleManager : MonoBehaviour
             buttonsImage[1].transform.localScale = new Vector3(1.1f,1.1f,1f);
             if(buttonsImage[0])
                 buttonsImage[0].transform.localScale = Vector3.one;
-            if(buttonsImage[2])
-                buttonsImage[2].transform.localScale = Vector3.one;
 
             buttonInfoImage.gameObject.SetActive(true);
-            if (chars[myTurn].charName == "Wizard")
-                buttonInfoText.text = string.Format("10의 체력을 소모해 \n모든 적에게 {0}만큼\n 피해를 입힙니다", gameData[currentPlayerNumber].playerAttackDamage);
-            else
-                buttonInfoText.text = string.Format("10의 체력을 소모해 \n적 하나에게 {0}만큼\n 피해를 입힙니다", gameData[currentPlayerNumber].playerAttackDamage * 2f);
+                buttonInfoText.text = "스킬 목록을 엽니다.";
 
         }
-        else if (HealButtonCol)
-        {
-            buttonsImage[2] = HealButtonCol.GetComponent<Image>();
-            buttonsImage[2].transform.localScale = new Vector3(1.1f, 1.1f, 1f);
-            if (buttonsImage[0])
-                buttonsImage[0].transform.localScale = Vector3.one;
-            if (buttonsImage[1])
-                buttonsImage[1].transform.localScale = Vector3.one;
-
-
-            buttonInfoText.text = string.Format("{0}만큼 체력을\n 회복합니다", gameData[currentPlayerNumber].skillDamage);
-            buttonInfoImage.gameObject.SetActive(true);
-        }
-        else if(buttonsImage[0] && buttonsImage[1] && buttonsImage[2])
+        else if(buttonsImage[0] && buttonsImage[1] )
         {
             buttonsImage[0].transform.localScale = Vector3.one;
             buttonsImage[1].transform.localScale = Vector3.one;
-            buttonsImage[2].transform.localScale = Vector3.one;
 
             buttonInfoImage.gameObject.SetActive(false);
         }
@@ -578,6 +600,66 @@ public class BattleManager : MonoBehaviour
         buttonInfoImage.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x + 350f,
                 Input.mousePosition.y, -Camera.main.transform.position.z));
     }
+
+    public void SkillButtonInfo()
+    {
+
+        Collider2D Skill1ButtonCol = MouseManager.instance.MouseRayCast("Skill1");
+        Collider2D Skill2ButtonCol = MouseManager.instance.MouseRayCast("Skill2");
+        Collider2D Skill3ButtonCol = MouseManager.instance.MouseRayCast("Skill3");
+
+        if (Skill1ButtonCol)
+        {
+            skillButtonsImages[0] = Skill1ButtonCol.GetComponent<Image>();
+            skillButtonsImages[0].transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+            if (skillButtonsImages[1])
+                skillButtonsImages[1].transform.localScale = Vector3.one;
+            if (skillButtonsImages[2])
+                skillButtonsImages[2].transform.localScale = Vector3.one;
+            buttonInfoImage.gameObject.SetActive(true);
+            buttonInfoText.text = string.Format("마나를 10 소모해 적 한명에게\n강한 공격을 가합니다");
+
+        }
+        else if (Skill2ButtonCol)
+        {
+            skillButtonsImages[1] = Skill2ButtonCol.GetComponent<Image>();
+            skillButtonsImages[1].transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+            if (skillButtonsImages[0])
+                skillButtonsImages[0].transform.localScale = Vector3.one;
+            if (skillButtonsImages[2])
+                skillButtonsImages[2].transform.localScale = Vector3.one;
+
+            buttonInfoImage.gameObject.SetActive(true);
+                buttonInfoText.text = string.Format("마나를 10 소모해 모든 적을 공격합니다");
+
+        }
+        else if (Skill3ButtonCol)
+        {
+            skillButtonsImages[2] = Skill3ButtonCol.GetComponent<Image>();
+            skillButtonsImages[2].transform.localScale = new Vector3(1.1f, 1.1f, 1f);
+            if (skillButtonsImages[0])
+                    skillButtonsImages[0].transform.localScale = Vector3.one;
+            if (skillButtonsImages[1])
+                skillButtonsImages[1].transform.localScale = Vector3.one;
+
+
+            buttonInfoText.text = string.Format("마나를 10 소모해 스스로를 치유합니다");
+            buttonInfoImage.gameObject.SetActive(true);
+        }
+        else if (skillButtonsImages[0] && skillButtonsImages[1] && skillButtonsImages[2])
+        {
+            skillButtonsImages[0].transform.localScale = Vector3.one;
+            skillButtonsImages[1].transform.localScale = Vector3.one;
+            skillButtonsImages[2].transform.localScale = Vector3.one;
+
+            buttonInfoImage.gameObject.SetActive(false);
+        }
+
+
+        buttonInfoImage.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x + 350f,
+                Input.mousePosition.y, -Camera.main.transform.position.z));
+    }
+
     public Collider2D SelectEnemy()
     {
         Collider2D col = MouseManager.instance.MouseRayCast("Enemy");
@@ -610,6 +692,9 @@ public class BattleManager : MonoBehaviour
         else
             return null;
     }
+
+
+
     PlayerManager[] RealizePlayer()
     {
         //플레이어의 수 파악
@@ -681,40 +766,50 @@ public class BattleManager : MonoBehaviour
     public void AttackClick()
     {
         buttonsParent.SetActive(false);
-        state = BattleState.targetselect;
         arrowImage.gameObject.SetActive(false);
-         buttonInfoImage.gameObject.SetActive(false);
-
+        buttonInfoImage.gameObject.SetActive(false);
+        state = BattleState.targetselect;
     }
 
     public void SkillClick()
     {
-        switch(chars[myTurn].charName)
-        {
-            case "Wizard":
-                state = BattleState.allTargetSkill;
-                break;
-            case "Mini":
-            case "Miho":
-                state = BattleState.oneTargetSkill;
-                break;
-        }
-
         buttonsParent.SetActive(false);
-
+        skillButtons.SetActive(true);
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
-
+        state = BattleState.SkillList;
+    }
+    void SkillReturn()
+    {
+        buttonsParent.SetActive(true);
+        skillButtons.SetActive(false);
+        arrowImage.gameObject.SetActive(true);
+        buttonInfoImage.gameObject.SetActive(true);
+        state = BattleState.skillselect;
     }
 
-    public void HealClick()
+    public void ChoiceSkill1()
     {
-
         buttonsParent.SetActive(false);
-
+        skillButtons.SetActive(false);
+        arrowImage.gameObject.SetActive(false);
+        buttonInfoImage.gameObject.SetActive(false);
+        state = BattleState.oneTargetSkill;
+    }
+    public void ChoiceSkill2()
+    {
+        buttonsParent.SetActive(false);
+        skillButtons.SetActive(false);
+        arrowImage.gameObject.SetActive(false);
+        buttonInfoImage.gameObject.SetActive(false);
+        state = BattleState.allTargetSkill;
+    }
+    public void ChoiceSkill3()
+    {
+        buttonsParent.SetActive(false);
+        skillButtons.SetActive(false);
         state = BattleState.Heal;
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
-
     }
 }

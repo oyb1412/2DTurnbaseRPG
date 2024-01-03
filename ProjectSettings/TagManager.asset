@@ -14,6 +14,9 @@ TagManager:
   - AttackButtonInfo
   - SkillButtonInfo
   - HealButtonInfo
+  - Skill1
+  - Skill2
+  - Skill3
   layers:
   - Default
   - TransparentFX

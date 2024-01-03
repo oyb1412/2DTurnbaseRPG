@@ -12,16 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c08df650cdf93346a45805695a397be, type: 3}
   m_Name: Player1 Data
   m_EditorClassIdentifier: 
-  currentGold: 0
+  currentGold: 85
   currentPlayerNumber: 3
-  playerCurrentHp: -15
+  playerCurrentHp: -7
   playerMaxHp: 200
-  playerAttackDamage: 14
+  playerCurrenMp: 0
+  playerMaxMp: 50
+  playerAttackDamage: 15
   PlayerName: Wizard
-  PlayerCurrendExp: 77
+  PlayerCurrendExp: 95
   PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 50
   plusPlayerGold: 300
   playerLevel: 1
-  skillDamage: 15
+  skillDamage: 30

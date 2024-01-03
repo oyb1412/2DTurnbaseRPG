@@ -702,7 +702,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5825c4765b936b1428ca86f7f510b0aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackOrder: 4
+  attackOrder: 50
   charName: 
   currentHp: 0
   maxHp: 0
@@ -714,8 +714,10 @@ MonoBehaviour:
   SetDead: 0
   SetHeal: 0
   attackTrigger: 0
+  gameData: {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
@@ -723,7 +725,6 @@ MonoBehaviour:
   - {fileID: 100000, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
   skillDamage: 0
   playerType: 1
-  gameData: {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
 --- !u!1 &2527723775591986571
 GameObject:
   m_ObjectHideFlags: 0

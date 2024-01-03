@@ -11,7 +11,7 @@ public class AssignManGER : MonoBehaviour
     public GameObject[] enemyPrefabs;
 
     [Header("--GameData--")]
-    public GameData gameData;
+    public GameData[] gameData;
 
     private void Awake()
     {
@@ -20,12 +20,15 @@ public class AssignManGER : MonoBehaviour
 
     void AssignCharObject()
     {
-        int playerNum = gameData.currentPlayerNumber;
+        int playerNum = gameData[0].currentPlayerNumber;
 
         for (int i = 0; i < playerNum; i++)
         {
-            Transform trans = Instantiate(playerPrefabs[i]).transform;
-            trans.position = new Vector2(-6f, (1f - i));
+            if (gameData[i].playerCurrentHp > 0)
+            {
+                Transform trans = Instantiate(playerPrefabs[i]).transform;
+                trans.position = new Vector2(-6f, (1f - i));
+            }
         }
 
         for (int i = 0; i < playerNum; i++)

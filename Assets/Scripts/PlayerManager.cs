@@ -15,8 +15,6 @@ public class PlayerManager : CharBase
     public Player playerType;//∞Ì¡§
 
 
-
-
  
     protected override void Awake()
     {
@@ -43,13 +41,15 @@ public class PlayerManager : CharBase
 
 
 
-    IEnumerator AttackAnimation(EnemyManager enemy, int effectnum)
+    IEnumerator AttackAnimation(EnemyManager enemy, int effectnum, int type)
     {
         if (!AnimationTrigger)
         {
             animator.SetTrigger("Attack");
+            base.CreateDamage(enemy, gameData.playerAttackDamage * type);
+
             SetEffect(enemy.transform, effectnum);
-            enemy.currentHp -= gameData.playerAttackDamage * 2;
+            enemy.currentHp -= gameData.playerAttackDamage * type;
             if (enemy.currentHp <= 0)
                 enemy.SetDead = true;
             else
@@ -60,29 +60,99 @@ public class PlayerManager : CharBase
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
-    public override void AllTargetAttack(EnemyManager[] enemy, int effectnum) 
-    {
-        if (SetAttack)
-        {
-            for (int i = 0; i < enemy.Length; i++)
-            {
-                enemy[i].currentHp -=gameData.playerAttackDamage;
 
+    IEnumerator AllAttackAnimation(EnemyManager[] enemy, int effectnum)
+    {
+        if (!AnimationTrigger)
+        {
+            animator.SetTrigger("Attack");
+            SetEffect(enemy[Mathf.Max(0,1)].transform, effectnum);
+            for(int i = 0; i < enemy.Length; i++)
+            {
+                base.CreateDamage(enemy[i], gameData.playerAttackDamage);
+
+                enemy[i].currentHp -= gameData.playerAttackDamage;
                 if (enemy[i].currentHp <= 0)
                     enemy[i].SetDead = true;
                 else
                     enemy[i].SetHit = true;
-
-
             }
-            animator.SetTrigger("Fire");
-            SetEffect(enemy[0].transform, effectnum);
+
         }
+        AnimationTrigger = true;
 
-        SetAttack = false;
-
+        yield return new WaitForSeconds(0.5f);
+        attackTrigger = true;
     }
-    public override void Attack(EnemyManager enemy, int effectnum)
+    public override void AllTargetAttack(EnemyManager[] enemy, int effectnum) 
+    {
+        switch (playerType)
+        {
+            case Player.Wizard:
+                if (SetAttack)
+                {
+                    for (int i = 0; i < enemy.Length; i++)
+                    {
+                        enemy[i].currentHp -= gameData.playerAttackDamage;
+                        base.CreateDamage(enemy[i], gameData.playerAttackDamage);
+                        if (enemy[i].currentHp <= 0)
+                            enemy[i].SetDead = true;
+                        else
+                            enemy[i].SetHit = true;
+
+                    }
+                    animator.SetTrigger("Fire");
+                    SetEffect(enemy[0].transform, effectnum);
+                }
+                SetAttack = false;
+                break;
+            case Player.Mini:
+            case Player.Miho:
+                if (SetAttack)
+                {
+                    if (!attackTrigger)
+                    {
+                        if (transform.position.x <= -6)
+                            dir = (enemy[Mathf.Max(0,1)].transform.position - transform.position).normalized;
+
+                        if (transform.position.x < 5.5f)
+                        {
+                            animator.SetTrigger("Move");
+                            transform.Translate(new Vector3(dir.x, dir.y, dir.z) * Time.deltaTime * speed);
+                        }
+                        else
+                        {
+                            StartCoroutine(AllAttackAnimation(enemy, effectnum));
+                        }
+                    }
+
+
+                    if (attackTrigger)
+                    {
+
+                        if (transform.position.x > -6f)
+                        {
+                            transform.localScale = new Vector3(-1f, 1f, 1f);
+                            animator.SetTrigger("Move");
+                            transform.Translate(new Vector3(-dir.x, -dir.y, dir.z) * Time.deltaTime * speed);
+                        }
+                        else
+                        {
+                            transform.localScale = Vector3.one;
+                            transform.position = new Vector3(-6f, transform.position.y, 0f);
+                            SetAttack = false;
+                            attackTrigger = false;
+                            AnimationTrigger = false;
+                            animator.SetTrigger("Idle");
+                        }
+                    }
+                }
+
+                break;
+
+        }
+    }
+    public override void Attack(EnemyManager enemy, int effectnum, int type)
     {
         switch (playerType)
         {
@@ -90,8 +160,9 @@ public class PlayerManager : CharBase
                 if (SetAttack)
                 {
                     animator.SetTrigger("Fire");
-                    SetEffect(enemy.transform, effectnum);
-                    enemy.currentHp -= gameData.playerAttackDamage;
+                    SetEffect(enemy.transform, 0);
+                    base.CreateDamage(enemy, gameData.playerAttackDamage * type);
+                    enemy.currentHp -= gameData.playerAttackDamage * type;
                     if (enemy.currentHp <= 0)
                         enemy.SetDead = true;
                     else
@@ -115,7 +186,7 @@ public class PlayerManager : CharBase
                         }
                         else
                         {
-                            StartCoroutine(AttackAnimation(enemy,effectnum));
+                            StartCoroutine(AttackAnimation(enemy,effectnum, type));
                         }
                     }
 
@@ -157,7 +228,7 @@ public class PlayerManager : CharBase
     }
 
 
-
+ 
     public void SetEffect(Transform pos, int effectnum)
     {
         Instantiate(effectPrefabs[effectnum], pos);

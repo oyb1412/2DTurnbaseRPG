@@ -16,12 +16,14 @@ MonoBehaviour:
   currentPlayerNumber: 1
   playerCurrentHp: 200
   playerMaxHp: 200
-  playerAttackDamage: 14
-  PlayerName: 
+  playerCurrenMp: 50
+  playerMaxMp: 50
+  playerAttackDamage: 15
+  PlayerName: Wizard
   PlayerCurrendExp: 0
   PlayerMaxExp: 100
   playerFieldPosition: {x: 0, y: 0}
   levelUseGold: 50
   plusPlayerGold: 300
   playerLevel: 1
-  skillDamage: 15
+  skillDamage: 30

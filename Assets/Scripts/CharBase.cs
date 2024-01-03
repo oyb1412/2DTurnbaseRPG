@@ -31,6 +31,7 @@ public class CharBase : MonoBehaviour
     [Header("--UI--")]
     public Slider hpBar;
     public Slider hpBarPrefabs;
+    public Text damageText;
 
     [Header("--Effect--")]
     public GameObject dustPrefabs;
@@ -53,6 +54,9 @@ public class CharBase : MonoBehaviour
     virtual protected void Update()
     {
         adjustAnimation();
+        hpBar.transform.position = Camera.main.WorldToScreenPoint(new Vector3(transform.position.x,
+            transform.position.y + 1f, transform.position.z));
+
     }
 
     private void OnDisable()
@@ -124,9 +128,15 @@ public class CharBase : MonoBehaviour
 
     virtual public void AllTargetAttack(EnemyManager[] enemy, int effectnum) { }
 
-    virtual public void Attack(EnemyManager enemy, int effectnum) { }
+    virtual public void Attack(EnemyManager enemy, int effectnum, int type) { }
 
     virtual public void MeleeAttackAndMove(PlayerManager player) { }
 
-
+    protected void CreateDamage(CharBase target, float damagenum)
+    {
+        Text damage = Instantiate(damageText, GameObject.Find("WorldCanvas").transform);
+        damage.transform.position = Camera.main.WorldToScreenPoint(new Vector3(target.transform.position.x + 1.3f,
+            target.transform.position.y, target.transform.position.z));
+        damage.text = "-" + damagenum.ToString();
+    }
 }

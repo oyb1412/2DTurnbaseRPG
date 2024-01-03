@@ -200,7 +200,7 @@ MonoBehaviour:
   attackOrder: 2
   charName: 
   currentHp: 5
-  maxHp: 200
+  maxHp: 500
   attackDamage: 15
   speed: 10
   dir: {x: 0, y: 0, z: 0}
@@ -212,10 +212,11 @@ MonoBehaviour:
   gameData: {fileID: 0}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
-  enemyType: 1
+  enemyType: 0
 --- !u!1 &2970297753304395015
 GameObject:
   m_ObjectHideFlags: 0

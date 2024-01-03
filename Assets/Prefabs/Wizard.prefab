@@ -1562,6 +1562,7 @@ MonoBehaviour:
   gameData: {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   hpBar: {fileID: 0}
   hpBarPrefabs: {fileID: 4327846067857927491, guid: bd98a961cdfa629498a22d34c3677a49, type: 3}
+  damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
