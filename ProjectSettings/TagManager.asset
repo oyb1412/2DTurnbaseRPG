@@ -17,6 +17,7 @@ TagManager:
   - Skill1
   - Skill2
   - Skill3
+  - TileMap
   layers:
   - Default
   - TransparentFX
