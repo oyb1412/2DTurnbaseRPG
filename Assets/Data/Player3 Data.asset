@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGold: 0
   currentPlayerNumber: 1
-  playerCurrentHp: 410
+  playerCurrentHp: 400
   playerMaxHp: 400
-  playerCurrenMp: 450
-  playerMaxMp: 500
+  playerCurrenMp: 0
+  playerMaxMp: 0
   playerAttackDamage: 24
   PlayerName: Miho
   PlayerCurrendExp: 0

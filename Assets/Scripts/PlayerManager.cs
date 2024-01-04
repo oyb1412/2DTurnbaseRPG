@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-
-
+using DG.Tweening;
+using static EnemyManager;
 public class PlayerManager : CharBase
 {
     [Header("--Info--")]
@@ -40,34 +40,16 @@ public class PlayerManager : CharBase
     }
 
 
-
-    IEnumerator AttackAnimation(EnemyManager enemy, int effectnum, int type)
+    IEnumerator AttackAnimation(EnemyManager[] enemy, int effectnum, int type)
     {
         if (!AnimationTrigger)
         {
+            int h = Random.Range(0, enemy.Length);
             animator.SetTrigger("Attack");
-            base.CreateDamage(enemy, gameData.playerAttackDamage * type);
-
-            SetEffect(enemy.transform, effectnum);
-            enemy.currentHp -= gameData.playerAttackDamage * type;
-            if (enemy.currentHp <= 0)
-                enemy.SetDead = true;
-            else
-                enemy.SetHit = true;
-        }
-        AnimationTrigger = true;
-
-        yield return new WaitForSeconds(0.5f);
-        attackTrigger = true;
-    }
-
-    IEnumerator AllAttackAnimation(EnemyManager[] enemy, int effectnum)
-    {
-        if (!AnimationTrigger)
-        {
-            animator.SetTrigger("Attack");
-            SetEffect(enemy[0].transform, effectnum);
-            for(int i = 0; i < enemy.Length; i++)
+            GameObject trans = new GameObject();
+            trans.transform.position = new Vector3(enemy[h].transform.position.x, 0f, 1f);
+            SetEffect(trans.transform, effectnum, type);
+            for (int i = 0; i < enemy.Length; i++)
             {
                 base.CreateDamage(enemy[i], gameData.playerAttackDamage);
 
@@ -77,7 +59,55 @@ public class PlayerManager : CharBase
                 else
                     enemy[i].SetHit = true;
             }
+        }
+        AnimationTrigger = true;
 
+        yield return new WaitForSeconds(0.5f);
+        attackTrigger = true;
+    }
+    IEnumerator MoveAnimation(EnemyManager[] enemy, int effectnum, int type)
+    {
+        animator.SetTrigger("Move");
+        int h = Random.Range(0,enemy.Length);
+        var tween = transform.DOMove(new Vector3(enemy[h].transform.position.x - 0.3f, enemy[h].transform.position.y, 1f), 1.5f);
+        yield return tween.WaitForCompletion();
+        StartCoroutine(AttackAnimation(enemy, effectnum, 1));
+    }
+
+    IEnumerator ReturnAnimation()
+    {
+        transform.localScale = new Vector3(-1f, 1f, 1f);
+        animator.SetTrigger("Move");
+        var tween = transform.DOMove(dir, 1.5f);
+        yield return tween.WaitForCompletion();
+        transform.localScale = Vector3.one;
+        SetAttack = false;
+        attackTrigger = false;
+        AnimationTrigger = false;
+        animator.SetTrigger("Idle");
+    }
+
+    IEnumerator MoveAnimation(EnemyManager enemy, int effectnum, int type)
+    {
+        animator.SetTrigger("Move");
+        var tween = transform.DOMove(new Vector3(enemy.transform.position.x - 0.3f, enemy.transform.position.y, 1.5f), 1);
+        yield return tween.WaitForCompletion();
+        StartCoroutine(AttackAnimation(enemy, effectnum, type));
+    }
+
+    IEnumerator AttackAnimation(EnemyManager enemy, int effectnum, int type)
+    {
+        if (!AnimationTrigger)
+        {
+            animator.SetTrigger("Attack");
+            CreateDamage(enemy, gameData.playerAttackDamage * type);
+
+            SetEffect(enemy.transform, effectnum, type);
+            enemy.currentHp -= gameData.playerAttackDamage * type;
+            if (enemy.currentHp <= 0)
+                enemy.SetDead = true;
+            else
+                enemy.SetHit = true;
         }
         AnimationTrigger = true;
 
@@ -91,6 +121,8 @@ public class PlayerManager : CharBase
             case Player.Wizard:
                 if (SetAttack)
                 {
+                    GameObject trans = new GameObject();
+                    trans.transform.position = new Vector3(enemy[0].transform.position.x, 0f, 1f);
                     for (int i = 0; i < enemy.Length; i++)
                     {
                         enemy[i].currentHp -= gameData.playerAttackDamage;
@@ -102,8 +134,9 @@ public class PlayerManager : CharBase
 
                     }
                     animator.SetTrigger("Fire");
-                    SetEffect(enemy[0].transform, effectnum);
+                    SetEffect(trans.transform, effectnum, 1);
                 }
+
                 SetAttack = false;
                 break;
             case Player.Mini:
@@ -111,41 +144,9 @@ public class PlayerManager : CharBase
                 if (SetAttack)
                 {
                     if (!attackTrigger)
-                    {
-                        if (transform.position.x <= -6)
-                            dir = (enemy[0].transform.position - transform.position).normalized;
-
-                        if (transform.position.x < 5.5f)
-                        {
-                            animator.SetTrigger("Move");
-                            transform.Translate(new Vector3(dir.x, dir.y, dir.z) * Time.deltaTime * speed);
-                        }
-                        else
-                        {
-                            StartCoroutine(AllAttackAnimation(enemy, effectnum));
-                        }
-                    }
-
-
-                    if (attackTrigger)
-                    {
-
-                        if (transform.position.x > -6f)
-                        {
-                            transform.localScale = new Vector3(-1f, 1f, 1f);
-                            animator.SetTrigger("Move");
-                            transform.Translate(new Vector3(-dir.x, -dir.y, dir.z) * Time.deltaTime * speed);
-                        }
-                        else
-                        {
-                            transform.localScale = Vector3.one;
-                            transform.position = new Vector3(-6f, transform.position.y, 0f);
-                            SetAttack = false;
-                            attackTrigger = false;
-                            AnimationTrigger = false;
-                            animator.SetTrigger("Idle");
-                        }
-                    }
+                        StartCoroutine(MoveAnimation(enemy,effectnum,1));
+                    else
+                        StartCoroutine(ReturnAnimation());
                 }
 
                 break;
@@ -160,7 +161,7 @@ public class PlayerManager : CharBase
                 if (SetAttack)
                 {
                     animator.SetTrigger("Fire");
-                    SetEffect(enemy.transform, 0);
+                    SetEffect(enemy.transform, effectnum, type);
                     base.CreateDamage(enemy, gameData.playerAttackDamage * type);
                     enemy.currentHp -= gameData.playerAttackDamage * type;
                     if (enemy.currentHp <= 0)
@@ -175,48 +176,12 @@ public class PlayerManager : CharBase
                 if (SetAttack)
                 {
                     if (!attackTrigger)
-                    {
-                        if(transform.position.x <= -6)
-                            dir = (enemy.transform.position - transform.position).normalized;
-
-                        if (transform.position.x < 5.5f)
-                        {
-                            animator.SetTrigger("Move");
-                            transform.Translate(new Vector3(dir.x, dir.y, dir.z) * Time.deltaTime * speed);
-                        }
-                        else
-                        {
-                            StartCoroutine(AttackAnimation(enemy,effectnum, type));
-                        }
-                    }
-
-
+                        StartCoroutine(MoveAnimation(enemy, effectnum, type));
                     if (attackTrigger)
-                    {
-                        if (transform.position.x > -6f)
-                        {
-                            transform.localScale = new Vector3(-1f, 1f, 1f);
-                            animator.SetTrigger("Move");
-                            transform.Translate(new Vector3(-dir.x, -dir.y, dir.z) * Time.deltaTime * speed);
-                        }
-                        else
-                        {
-                            transform.localScale = Vector3.one;
-                            transform.position = new Vector3(-6f, transform.position.y, 0f);
-                            SetAttack = false;
-                            attackTrigger = false;
-                            AnimationTrigger = false;
-                            animator.SetTrigger("Idle");
-
-                        }
-                    }
-
+                        StartCoroutine(ReturnAnimation());
                 }
                 break;
         }
-        
-    
-
     }
   
     protected override void Init()
@@ -229,8 +194,5 @@ public class PlayerManager : CharBase
 
 
  
-    public void SetEffect(Transform pos, int effectnum)
-    {
-        Instantiate(effectPrefabs[effectnum], pos);
-    }
+
 }

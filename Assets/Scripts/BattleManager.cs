@@ -2,6 +2,8 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using UnityEditor.SceneManagement;
 
 public class BattleManager : MonoBehaviour
 {
@@ -53,6 +55,7 @@ public class BattleManager : MonoBehaviour
     public int deadCount;
     Collider2D target;
     public bool trigger;
+    public bool attackTrigger;
     public int currentPlayerNumber;
     int dead;
 
@@ -80,18 +83,17 @@ public class BattleManager : MonoBehaviour
 
              switch (StateManager.instance.currentState)
             {
+
                 case StateManager.BattleState.StartTurn:
 
                 chars = RealizeChar();
-                battleInfoText.text = string.Format("{0}'s Turn", chars[0].charName);
-                if (Input.GetMouseButtonDown(0))
-                {
+                battleInfoImage.gameObject.SetActive(true);
                     state = BattleState.main;
                     if (chars[0].GetComponentInChildren<PlayerManager>())
                         StateManager.instance.currentState = StateManager.BattleState.PlayerTurn;
                      else
                         StateManager.instance.currentState = StateManager.BattleState.EnemyTurn;
-                }
+                
                 break;
                 case StateManager.BattleState.PlayerTurn:
                 switch (state)
@@ -108,11 +110,15 @@ public class BattleManager : MonoBehaviour
                                 break;
                             }
                         }
-                        battleInfoText.text = string.Format("{0}'s Turn", chars[myTurn].charName);
-                        ChangeState(BattleState.skillselect);
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0}'s Turn", chars[myTurn].charName), 1);
+                            StartCoroutine(ChangeState(BattleState.skillselect, 1.5f));
+                            trigger = true;
+                        }
                         break;
                     case BattleState.skillselect:
-                        battleInfoText.text = "Select Your Action";
                         ButtonInfo();
                         if (gameData[currentPlayerNumber].playerCurrenMp < 10)
                         {
@@ -126,57 +132,89 @@ public class BattleManager : MonoBehaviour
                             chars[myTurn].transform.position.y+1.5f,
                             chars[myTurn].transform.position.z);
 
-
+                        if (!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText("Select Your Action",1);
+                            trigger = true;
+                        }
 
                         break;
                     case BattleState.SkillList:
-                        battleInfoText.text = "Select Your Skill";
                         SkillButtonInfo();
                         skillButtons.transform.position = new Vector3(chars[myTurn].transform.position.x + 3.5f,
                             chars[myTurn].transform.position.y + 1.5f,
                             chars[myTurn].transform.position.z);
-
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText("Select your Skill", 1);
+                            trigger = true;
+                        }
                         if (Input.GetMouseButtonDown(1))
                         {
                             SkillReturn();
                         }
                         break;
                     case BattleState.allTargetSkill:
-                        battleInfoText.text = string.Format("MP -10 {0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage);
-                        ChangeState(BattleState.allTargetSkillAttack);
-
-                        break;
-                    case BattleState.oneTargetSkill:
-                        battleInfoText.text = string.Format("MP -10 {0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage * 2);
-                        target = SelectEnemy();
-                        if (target != null)
-                        {
-                            targetEnemy = target.gameObject.GetComponent<EnemyManager>();
-                            ChangeState(BattleState.oneTargetSkillAttack);
-                        }
-                        break;
-                    case BattleState.Heal:
-                        battleInfoText.text = string.Format("MP -10 {0} HP Self Healing", gameData[currentPlayerNumber].skillDamage);
-                        ChangeState(BattleState.useHeal);
-                        break;
-                    case BattleState.allTargetSkillAttack:
-                        battleInfoText.text = string.Format("{0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage);
 
                         if (!trigger)
                         {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("MP -10 {0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage), 1);
+                            StartCoroutine(ChangeState(BattleState.allTargetSkillAttack, 1.5f));
+
+                            trigger = true;
+                        }
+                        break;
+                    case BattleState.oneTargetSkill:
+                        target = SelectEnemy();
+                        if (!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("MP -10 {0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage * 2), 1);
+                            trigger = true;
+                        }
+                        if (target != null)
+                        {
+                            targetEnemy = target.gameObject.GetComponent<EnemyManager>();
+                            trigger = false;
+                            state = BattleState.oneTargetSkillAttack;
+                        }
+                        break;
+                    case BattleState.Heal:
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("MP -10 {0} HP Self Healing", gameData[currentPlayerNumber].skillDamage), 1);
+                            trigger = true;
+                        }
+                        ChangeState(BattleState.useHeal);
+                        break;
+                    case BattleState.allTargetSkillAttack:
+
+                        if (!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0} Damage All Enemies", gameData[currentPlayerNumber].playerAttackDamage), 1);
                             gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].AllTargetAttack(enemys, 1);
+                        chars[myTurn].AllTargetAttack(enemys, 3);
 
-                        if (!chars[myTurn].SetAttack)
-                            ChangeState(BattleState.allTargetSkillCheck);
+                        if (!chars[myTurn].SetAttack && !attackTrigger)
+                        {
+                            StartCoroutine(ChangeState(BattleState.allTargetSkillCheck, 1.5f));
+                            attackTrigger = true;
+                        }
 
                         break;
                     case BattleState.allTargetSkillCheck:
                         if (!trigger)
                         {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("Enemy Dead a {0}'s Attack", chars[myTurn].charName), 1);
                             for (int i = 0; i < enemys.Length; i++)
                             {
                                 if (enemys[i].currentHp <= 0)
@@ -191,14 +229,19 @@ public class BattleManager : MonoBehaviour
                             chars = chars.Where(x => null != x).ToArray(); //null 배열만 지움
 
 
-                            battleInfoText.text = string.Format("Enemy Dead a {0}'s Attack", chars[myTurn].charName);
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
+                                trigger = false;
                                 state = BattleState.changePlayer;
                             }
                             else
                             {
-                                battleInfoText.text = "Win!!!";
+                                if(trigger)
+                                {
+                                    battleInfoText.text = "Win!!!";
+                                    trigger = false;
+                                }
+
                                 int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
                                 switch (enemyType)
                                 {
@@ -224,63 +267,75 @@ public class BattleManager : MonoBehaviour
                         
                         break;
                     case BattleState.oneTargetSkillAttack:
-                        battleInfoText.text = string.Format("{0} Damage to {1}", chars[myTurn].attackDamage * 2f, targetEnemy.charName);
 
                         if (!trigger)
                         {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0} Damage to {1}", chars[myTurn].attackDamage * 2f, targetEnemy.charName),1);
                             gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].Attack(targetEnemy, 1, 2);
-
-                        if (!chars[myTurn].SetAttack)
-                            ChangeState(BattleState.Check);
+                        chars[myTurn].Attack(targetEnemy, 2, 2);
+                        if (!chars[myTurn].SetAttack && !attackTrigger)
+                        {
+                            StartCoroutine(ChangeState(BattleState.Check, 1.5f));
+                            attackTrigger = true;
+                        }
                         break;
                     case BattleState.useHeal:
                         if (!trigger)
                         {
                             gameData[currentPlayerNumber].playerCurrenMp -= 10;
                             chars[myTurn].SetHeal = true;
-                            battleInfoText.text = string.Format("{0} HP Recovery", (gameData[currentPlayerNumber].skillDamage));
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0} HP Recovery", (gameData[currentPlayerNumber].skillDamage)),1);
 
                             gameData[currentPlayerNumber].playerCurrentHp += gameData[currentPlayerNumber].skillDamage;
                             if (gameData[currentPlayerNumber].playerCurrentHp >= gameData[currentPlayerNumber].playerMaxHp)
                                 gameData[currentPlayerNumber].playerCurrentHp = gameData[currentPlayerNumber].playerMaxHp;
 
-                                Transform effect = Instantiate(chars[myTurn].effectPrefabs[2], chars[myTurn].transform).transform;
+                                Transform effect = Instantiate(chars[myTurn].effectPrefabs[0], chars[myTurn].transform).transform;
                             effect.transform.position = new Vector3(chars[myTurn].transform.position.x,
                                 chars[myTurn].transform.position.y+0.5f,
                                 chars[myTurn].transform.position.z);
                             trigger = true;
+
+                            StartCoroutine(ChangeState(BattleState.changePlayer, 1.5f));
+
                         }
-                        ChangeState(BattleState.changePlayer);
                         break;
                     case BattleState.targetselect:
-                        battleInfoText.text = "Select a Target";
-
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText("Select a Target",1);
+                            trigger = true;
+                        }
                         PlyerInfo();
                         target = SelectEnemy();
                         if (target != null)
                         {
                             targetEnemy = target.gameObject.GetComponent<EnemyManager>();
                             state = BattleState.attack;
+                            trigger = false;
                         }
                         break;
                     case BattleState.attack:
-                        battleInfoText.text = string.Format("{0} Damage to {1}", gameData[currentPlayerNumber].playerAttackDamage, targetEnemy.charName);
 
                         if(!trigger)
                         {
-                            //공격(체력감소)
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0} Damage to {1}", gameData[currentPlayerNumber].playerAttackDamage, targetEnemy.charName), 1);
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].Attack(targetEnemy,0, 1);
-                        
-
-                        if (!chars[myTurn].SetAttack)
-                            ChangeState(BattleState.Check);
+                        chars[myTurn].Attack(targetEnemy,1, 1);
+                        if (!chars[myTurn].SetAttack && !attackTrigger)
+                        {
+                            attackTrigger = true;
+                            StartCoroutine(ChangeState(BattleState.Check, 1.5f));
+                        }
 
                         break;
                     case BattleState.Check:
@@ -288,12 +343,18 @@ public class BattleManager : MonoBehaviour
                         {
                             if (GameObject.FindGameObjectsWithTag("Enemy").Length > 0)
                             {
-                                chars = chars.Where(x => null != x).ToArray(); 
+                                chars = chars.Where(x => null != x).ToArray();
+                                trigger = false;
                                 state = BattleState.changePlayer;
                             }
                             else
                             {
-                                battleInfoText.text = "Win!!!";
+                                if(!trigger)
+                                {
+                                    battleInfoText.text = "";
+                                    battleInfoText.DOText("Win!!!", 1);
+                                    trigger = true;
+                                }
 
                                 int enemyType = PlayerPrefs.GetInt("colliderEnemyType");
                                 switch (enemyType)
@@ -310,7 +371,7 @@ public class BattleManager : MonoBehaviour
                                 }
                                 if (Input.GetMouseButtonDown(0))
                                 {
-                                    GameManager.instance.WinPanel(true);
+                                    GameManager.instance.SetPanel(true);
 
                                     gameData[0].currentGold = gameData[0].currentGold + (gold * gameData[0].currentPlayerNumber);
                                     for (int i = 0; i < players.Length; i++)
@@ -334,15 +395,20 @@ public class BattleManager : MonoBehaviour
                         }
                         else
                         {
+                            trigger = false;
                             state = BattleState.changePlayer;
                         }
                         break;
                     case BattleState.Win:
-                        battleInfoText.text = string.Format("Get {0} Gold! Get {1} Exp!", gold * gameData[0].currentPlayerNumber, gold + 10);
- 
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("Get {0} Gold! Get {1} Exp!", gold * gameData[0].currentPlayerNumber, gold + 10), 1);
+                            trigger = true;
+                        }
                         if (Input.GetMouseButtonDown(0))
                         {
-                            GameManager.instance.WinPanel(false);
+                            GameManager.instance.SetPanel(false);
                             //AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, false);
                             GameManager.instance.ActionFade((int)GameManager.Scenes.FieldScene);
                         }
@@ -353,30 +419,25 @@ public class BattleManager : MonoBehaviour
                         if (myTurn +1 >= chars.Length)
                             myTurn = -1;
 
-                            //공격 후 다음순번 캬랴 선택
                             if (chars.Length > myTurn + 1)
                             {
-                                battleInfoText.text = string.Format("Next Turn {0}'s", chars[myTurn + 1].charName);
-                            //다음순번 캬라가 적이면 currentstate 바꾸기
-                            if (chars[myTurn+1].GetComponent<EnemyManager>())
-                                {
-                                    if (Input.GetMouseButtonDown(0))
-                                    {
-                                        myTurn ++;
-                                        state = BattleState.main;
-                                        StateManager.instance.currentState = StateManager.BattleState.EnemyTurn;
-                                    }
-                                }
-                                //다음순번 캬라가 적이 아니면 currentstate 그대로
-                                else
-                                {
-                                    if (Input.GetMouseButtonDown(0))
-                                    {
-                                        myTurn++;
-                                        state = BattleState.main;
-                                    }
-                                }
+
+                            if (chars[myTurn + 1].GetComponent<EnemyManager>())
+                            {
+                                    myTurn++;
+                                    attackTrigger = true;
+                                    state = BattleState.main;
+                                    StateManager.instance.currentState = StateManager.BattleState.EnemyTurn;
                             }
+                            else
+                            {
+                                    myTurn++;
+                                    attackTrigger = true;
+                                    state = BattleState.main;
+                            }
+                            attackTrigger = false;
+
+                        }
                         break;
                 }
                 break;
@@ -386,63 +447,81 @@ public class BattleManager : MonoBehaviour
                     case BattleState.main:
                         players = RealizePlayer();
                         enemys = RealizeEnemy();
-                        battleInfoText.text = string.Format("{0}'s Turn", chars[myTurn].charName);
-                        ChangeState(BattleState.targetselect);
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0}'s Turn", chars[myTurn].charName), 1);
+                            trigger = true;
+                            StartCoroutine(ChangeState(BattleState.targetselect, 1.5f));
+                        }
                         break;
                     case BattleState.targetselect:
                         players = SelectPlayer(); //데이터 기준으로
                         target = players[0].GetComponent<Collider2D>();
-  
+        
                         if (target != null)
                         {
                             targetPlayer = target.gameObject.GetComponent<PlayerManager>();
-                            battleInfoText.text = string.Format("{0} Select {1}", chars[myTurn].charName, targetPlayer.charName);
-                            ChangeState(BattleState.attack);
+                            state = BattleState.attack;
                         }
                         break;
                     case BattleState.attack:
-                        battleInfoText.text = string.Format("{0}'s got {1} Damage", targetPlayer.charName, chars[myTurn].attackDamage);
 
                         if (!trigger)
                         {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText(string.Format("{0}'s got {1} Damage", targetPlayer.charName, chars[myTurn].attackDamage), 1);
                             chars[myTurn].SetAttack = true;
                             trigger = true;
                         }
-                        chars[myTurn].MeleeAttackAndMove(targetPlayer);
+                        chars[myTurn].Attack(targetPlayer);
+                        if (!chars[myTurn].SetAttack && !attackTrigger)
+                        {
+                            attackTrigger = true;
+                            StartCoroutine(ChangeState(BattleState.Check, 1.0f));
+                        }
 
-                        if (!chars[myTurn].SetAttack)
-                            ChangeState(BattleState.Check);
                         break;
                     case BattleState.Check:
                         if (targetPlayer.gameData.playerCurrentHp <= 0)
                         {
                             chars = chars.Where(x => null != x).ToArray(); //null 배열만 지움
-
-                            battleInfoText.text = string.Format("{0}'s Attack {1}'s Dead", chars[myTurn].charName, targetPlayer.charName);
+                            //if(!trigger)
+                            //{
+                            //    battleInfoText.text = "";
+                            //    battleInfoText.DOText(string.Format("{0}'s Attack {1}'s Dead", chars[myTurn].charName, targetPlayer.charName), 1);
+                            //    trigger = true;
+                            //}
                             if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                             {
+                                trigger = false;
                                 state = BattleState.changePlayer;
-
-
                             }
                             else
                             {
-                                battleInfoText.text = "Lose...";
-                                ChangeState(BattleState.Lose);
-
-                              
+                                if(!trigger)
+                                {
+                                    battleInfoText.text = "";
+                                    battleInfoText.text = "Lose...";
+                                    trigger = true;
+                                    StartCoroutine(ChangeState(BattleState.Lose, 1.5f));
+                                }
                             }
                         }
                         else
                         {
                             trigger = false;
                             state = BattleState.changePlayer;
-
-
                         }
                         break;
                     case BattleState.Lose:
-                        battleInfoText.text = "Lost 100 Gold...";
+                        if(!trigger)
+                        {
+                            battleInfoText.text = "";
+                            battleInfoText.DOText("Lost 100 Gold and EXP...", 1);
+                            GameManager.instance.SetPanel(false);
+                            trigger = true;
+                        }
                         if (Input.GetMouseButtonDown(0))
                         {
                             if(gameData[0].currentGold > 100)
@@ -460,7 +539,6 @@ public class BattleManager : MonoBehaviour
                             }
                             gameData[0].playerFieldPosition = new Vector2(-9.3f, -9.5f);
                             //AudioManager.instance.PlayerBgm(AudioManager.Bgm.Battle, false);
-
                             GameManager.instance.ActionFade((int)GameManager.Scenes.FieldScene);
                         }
                         break;
@@ -471,31 +549,40 @@ public class BattleManager : MonoBehaviour
                         //공격 후 다음순번 플레이어 선택
                         if (chars.Length > myTurn + 1)
                         {
-                            battleInfoText.text = string.Format("Next Turn {0}'s", chars[myTurn + 1].charName);
                             if (chars[myTurn + 1].GetComponent<EnemyManager>())
                             {
-                                if (Input.GetMouseButtonDown(0))
-                                {
                                     myTurn++;
                                     trigger = false;
-                                    state = BattleState.main;
-                                }
+                                    state = BattleState.main; 
                             }
                             else
                             {
-                                if (Input.GetMouseButtonDown(0))
-                                {
                                     myTurn++;
                                     trigger = false;
                                     state = BattleState.main;
                                     StateManager.instance.currentState = StateManager.BattleState.PlayerTurn;
-                                }
                             }
                         }
                         break;
                 }
                 break;
             }
+    }
+
+
+    IEnumerator ChangeState(BattleState state, float time, StateManager.BattleState mainstate)
+    {
+        yield return new WaitForSeconds(time);
+        trigger = false;
+        StateManager.instance.currentState = mainstate;
+        this.state = state;
+    }
+    IEnumerator ChangeState(BattleState state, float time)
+    {
+        yield return new WaitForSeconds(time);
+        trigger = false;
+        attackTrigger = false;
+        this.state = state;
     }
     void Init()
     {
@@ -505,8 +592,6 @@ public class BattleManager : MonoBehaviour
         PlayerInfoText = PlayerInfoImage.GetComponentInChildren<Text>();
 
         buttonsParent.gameObject.SetActive(false);
-        battleInfoImage.gameObject.SetActive(true);
-        battleInfoText.gameObject.SetActive(true);
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
     }
@@ -555,7 +640,6 @@ public class BattleManager : MonoBehaviour
         else if(player)
         {
             player.transform.localScale = Vector3.one;
-
             PlayerInfoImage.gameObject.SetActive(false);
         }
     }
@@ -565,7 +649,6 @@ public class BattleManager : MonoBehaviour
 
         Collider2D AttackButtonCol = MouseManager.instance.MouseRayCast("AttackButtonInfo");
         Collider2D SkillButtonCol = MouseManager.instance.MouseRayCast("SkillButtonInfo");
-
         if (AttackButtonCol)
         {
             buttonsImage[0] = AttackButtonCol.GetComponent<Image>();
@@ -574,7 +657,6 @@ public class BattleManager : MonoBehaviour
                 buttonsImage[1].transform.localScale = Vector3.one;
             buttonInfoImage.gameObject.SetActive(true);
             buttonInfoText.text = string.Format("{0} Damage One Enemy", gameData[currentPlayerNumber].playerAttackDamage);
-
         }
         else if (SkillButtonCol)
         {
@@ -767,6 +849,7 @@ public class BattleManager : MonoBehaviour
         buttonsParent.SetActive(false);
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
+        trigger = false;
         state = BattleState.targetselect;
     }
 
@@ -784,6 +867,8 @@ public class BattleManager : MonoBehaviour
         skillButtons.SetActive(false);
         arrowImage.gameObject.SetActive(true);
         buttonInfoImage.gameObject.SetActive(true);
+        trigger = false;
+
         state = BattleState.skillselect;
     }
 
@@ -793,6 +878,8 @@ public class BattleManager : MonoBehaviour
         skillButtons.SetActive(false);
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
+        trigger = false;
+
         state = BattleState.oneTargetSkill;
     }
     public void ChoiceSkill2()
@@ -801,12 +888,16 @@ public class BattleManager : MonoBehaviour
         skillButtons.SetActive(false);
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);
+        trigger = false;
+
         state = BattleState.allTargetSkill;
     }
     public void ChoiceSkill3()
     {
         buttonsParent.SetActive(false);
         skillButtons.SetActive(false);
+        trigger = false;
+
         state = BattleState.Heal;
         arrowImage.gameObject.SetActive(false);
         buttonInfoImage.gameObject.SetActive(false);

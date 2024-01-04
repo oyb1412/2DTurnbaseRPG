@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.U2D.Aseprite;
@@ -26,9 +27,17 @@ public class EnemyManager : CharBase
         hpBar.value = currentHp / maxHp;
     }
 
-    IEnumerator MeleeAttackAnimation(PlayerManager player)
+    IEnumerator MoveAnimation(PlayerManager player)
     {
-        if (!AnimationTrigger)
+        animator.SetTrigger("Move");
+        var tween = transform.DOMove(new Vector3(player.transform.position.x + 0.3f, player.transform.position.y, 1f), 1.5f).SetEase(base.charEase);
+        yield return tween.WaitForCompletion();
+        StartCoroutine(AttackAnimation(player));
+    }
+
+    IEnumerator AttackAnimation(PlayerManager player)
+    {
+        if (!AnimationTrigger && transform.position.x < 0)
         {
             animator.SetTrigger("Attack");
             Instantiate(effectPrefabs[0], player.transform);
@@ -45,53 +54,27 @@ public class EnemyManager : CharBase
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
-    public override void MeleeAttackAndMove(PlayerManager player)
+
+    IEnumerator ReturnAnimation()
+    {
+        transform.localScale = Vector3.one;
+        animator.SetTrigger("Move");
+        var tween = transform.DOMove(dir, 1.5f).SetEase(base.charEase);
+        yield return tween.WaitForCompletion();
+        transform.localScale = new Vector3(-1f, 1f, 1f);
+        SetAttack = false;
+        attackTrigger = false;
+        AnimationTrigger = false;
+        animator.SetTrigger("Idle");
+    }
+    public override void Attack(PlayerManager player)
     {
         if (SetAttack)
         {
             if (!attackTrigger)
-            {
-                if (transform.position.x >= 6)
-                    dir = (player.transform.position - transform.position).normalized;
-
-                if (transform.position.x > -5.5f)
-                {
-                    animator.SetTrigger("Move");
-                    transform.Translate(new Vector3(dir.x, dir.y, dir.z) * Time.deltaTime * speed);
-                }
-                else
-                {
-                    StartCoroutine(MeleeAttackAnimation(player));
-                }
-            }
-
-
-            if (attackTrigger)
-            {
-                if (transform.position.x < 6f)
-                {
-                    transform.localScale = Vector3.one;
-                    animator.SetTrigger("Move");
-                    transform.Translate(new Vector3(-dir.x, -dir.y, dir.z) * Time.deltaTime * speed);
-                }
-                else
-                {
-                    transform.localScale = new Vector3(-1f, 1f, 1f);
-                    transform.position = new Vector3(6f, transform.position.y, 0f);
-                    SetAttack = false;
-                    attackTrigger = false;
-                    AnimationTrigger = false;
-                    animator.SetTrigger("Idle");
-
-                }
-            }
-
+                StartCoroutine(MoveAnimation(player));
+            else
+                StartCoroutine(ReturnAnimation());
         }
-
-
-
-
     }
-
-
 }

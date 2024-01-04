@@ -24,11 +24,7 @@ public class GameManager : MonoBehaviour
     Text[] winPlayerText;
     Slider[,] winPlayerSldiers;
     Image[] iconPanelImge;
-    [Serializable]
-    public class _2dArray
-    {
-        public int[] arr = new int[3];
-    }
+ 
     // Start is called before the first frame update
     private void Awake()
     {
@@ -123,6 +119,7 @@ public class GameManager : MonoBehaviour
             fadeImage.color = new Color(0, 0, 0, fadeCount);
             if(fadeCount < 0)
             {
+                isPlaying = true;
                 fadeImage.gameObject.SetActive(false);
                 fadeCount = 0;
             }
@@ -150,7 +147,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void WinPanel(bool trigger)
+    public void SetPanel(bool trigger)
     {
         winPlayerIcon[0].gameObject.SetActive(trigger);
         if (gameDatas[0].currentPlayerNumber == 2)
@@ -168,4 +165,6 @@ public class GameManager : MonoBehaviour
         iconPanels[0].transform.parent.gameObject.SetActive(false);
         winPlayerIcon[0].transform.parent.gameObject.SetActive(trigger);
     }
+
+
 }

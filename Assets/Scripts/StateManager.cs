@@ -17,7 +17,6 @@ public class StateManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        GameManager.instance.isPlaying = true;
  
     }
     private void Start()

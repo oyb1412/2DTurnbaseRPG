@@ -16,8 +16,8 @@ MonoBehaviour:
   currentPlayerNumber: 1
   playerCurrentHp: 400
   playerMaxHp: 400
-  playerCurrenMp: 0
-  playerMaxMp: 0
+  playerCurrenMp: 50
+  playerMaxMp: 50
   playerAttackDamage: 24
   PlayerName: Miho
   PlayerCurrendExp: 0

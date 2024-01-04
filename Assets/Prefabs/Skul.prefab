@@ -197,11 +197,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b95511fa437be614e9e0d30a3461f6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackOrder: 1
+  charEase: 1
+  attackOrder: 20
   charName: 
-  currentHp: 1
-  maxHp: 500
-  attackDamage: 8
+  currentHp: 0
+  maxHp: 20
+  attackDamage: 1
   speed: 10
   dir: {x: 0, y: 0, z: 0}
   SetAttack: 0

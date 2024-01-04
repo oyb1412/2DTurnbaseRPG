@@ -16,8 +16,8 @@ MonoBehaviour:
   currentPlayerNumber: 1
   playerCurrentHp: 300
   playerMaxHp: 300
-  playerCurrenMp: 0
-  playerMaxMp: 0
+  playerCurrenMp: 50
+  playerMaxMp: 50
   playerAttackDamage: 19
   PlayerName: Mini
   PlayerCurrendExp: 0

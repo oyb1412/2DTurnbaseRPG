@@ -26966,8 +26966,7 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 4
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8322815150097386062, guid: 8485be9b8f9710241b6b767557ad4474, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

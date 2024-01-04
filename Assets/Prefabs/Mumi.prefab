@@ -199,9 +199,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackOrder: 2
   charName: 
-  currentHp: 5
-  maxHp: 500
-  attackDamage: 15
+  currentHp: 0
+  maxHp: 10
+  attackDamage: 100
   speed: 10
   dir: {x: 0, y: 0, z: 0}
   SetAttack: 0
@@ -216,7 +216,7 @@ MonoBehaviour:
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
   - {fileID: 8771972552311404799, guid: bbf9e36a48d6c5648a13889afab076fd, type: 3}
-  enemyType: 0
+  enemyType: 1
 --- !u!1 &2970297753304395015
 GameObject:
   m_ObjectHideFlags: 0

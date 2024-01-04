@@ -1,12 +1,18 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using UnityEngine.UI;
+using static EnemyManager;
 using static FieldEnemy;
 
 public class CharBase : MonoBehaviour
 {
+    [Header("--DOTween--")]
+    public Ease charEase;
+
     [Header("--Info--")]
     public int attackOrder;
     public string charName;
@@ -44,11 +50,16 @@ public class CharBase : MonoBehaviour
     virtual protected void Awake()
     {
         speed = 10f;
+
         animator = GetComponent<Animator>();
     }
+
+    
     private void Start()
     {
         CommonInit();
+        dir = transform.position;
+
     }
     // Update is called once per frame
     virtual protected void Update()
@@ -83,7 +94,6 @@ public class CharBase : MonoBehaviour
     private IEnumerator DeadAnimation()
     {
         animator.SetTrigger("Die");
-        Debug.Log("1");
         SetDead = false;
         yield return new WaitForSeconds(1f);
         gameObject.SetActive(false);
@@ -130,7 +140,7 @@ public class CharBase : MonoBehaviour
 
     virtual public void Attack(EnemyManager enemy, int effectnum, int type) { }
 
-    virtual public void MeleeAttackAndMove(PlayerManager player) { }
+    virtual public void Attack(PlayerManager player) { }
 
     protected void CreateDamage(CharBase target, float damagenum)
     {
@@ -138,5 +148,13 @@ public class CharBase : MonoBehaviour
         damage.transform.position = Camera.main.WorldToScreenPoint(new Vector3(target.transform.position.x + 1.3f,
             target.transform.position.y, target.transform.position.z));
         damage.text = "-" + damagenum.ToString();
+    }
+
+
+
+    public void SetEffect(Transform pos, int effectnum, int type)
+    {
+        Transform effect = Instantiate(effectPrefabs[effectnum], pos).transform;
+        effect.transform.localScale = effect.transform.localScale * type;
     }
 }

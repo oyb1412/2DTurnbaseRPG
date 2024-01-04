@@ -1462,8 +1462,8 @@ Transform:
   m_GameObject: {fileID: 8882028493846298407}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.66, y: -1.03, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1.4626712}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 830114659465507610}
@@ -1565,8 +1565,9 @@ MonoBehaviour:
   damageText: {fileID: 1537153290715010020, guid: da842c135db069e46b5371e263b1f877, type: 3}
   dustPrefabs: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf, type: 3}
   effectPrefabs:
-  - {fileID: 1354241482965848852, guid: 55a6bd30d183b354a8765c3239d569c0, type: 3}
-  - {fileID: 3026081668111192717, guid: 2946f327263d3834b9bb4105cd9b72c6, type: 3}
   - {fileID: 2139001444427623641, guid: ada5d62ffe762ce4fbccc70dcdbc9022, type: 3}
+  - {fileID: 1354241482965848852, guid: 55a6bd30d183b354a8765c3239d569c0, type: 3}
+  - {fileID: 1354241482965848852, guid: 55a6bd30d183b354a8765c3239d569c0, type: 3}
+  - {fileID: 8904127869197418363, guid: b5cf28e7b120e1c4b85ea3eda417de0f, type: 3}
   skillDamage: 0
   playerType: 0

@@ -284,9 +284,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackOrder: 3
   charName: 
-  currentHp: 150
-  maxHp: 500
-  attackDamage: 20
+  currentHp: 0
+  maxHp: 10
+  attackDamage: 100
   speed: 10
   dir: {x: 0, y: 0, z: 0}
   SetAttack: 0
