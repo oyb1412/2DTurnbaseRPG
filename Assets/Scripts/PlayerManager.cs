@@ -1,46 +1,46 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
-using static EnemyManager;
 public class PlayerManager : CharBase
 {
-    [Header("--Info--")]
-    public float skillDamage;//고정
-
-
-    public enum Player { Wizard, Mini, Miho }//고정
-    public Player playerType;//고정
-
-
+    public enum Player { Wizard, Mini, Miho }
+    public Player playerType;
  
     protected override void Awake()
     {
         base.Awake();
         Init();
-        charName = playerType.ToString();
+        CharName = playerType.ToString();
+    }
+
+    protected override void Init() {
+        CurrentHp = gameData.PlayerCurrentHp;
+        MaxHp = gameData.PlayerMaxHp;
+        AttackDamage = gameData.PlayerAttackDamage;
     }
 
     protected override void Update()
     {
         base.Update();
-        base.craeteDustEffect(-6f);
+        craeteDustEffect(-6f);
 
-        base.ShowHpBar(MouseManager.instance.MouseRayCast("Player"));//다른자식과 다른내용의 함수
+        ShowHpBar(MouseManager.instance.MouseRayCast("Player"));
 
-        if (base.SetHeal)
+        if (SetHeal)
         {
-            base.animator.SetTrigger("Attack");
-            base.SetHeal = false;
+            animator.SetTrigger("Attack");
+            SetHeal = false;
         }
-        hpBar.value = gameData.playerCurrentHp / gameData.playerMaxHp;
+        hpBar.value = gameData.PlayerCurrentHp / gameData.PlayerMaxHp;
 
     }
-
-
-    IEnumerator AttackAnimation(EnemyManager[] enemy, int effectnum, int type)
+    #region AnimationMethod
+    /// <summary>
+    /// 광역 공격 애니메이션 코루틴
+    /// </summary>
+    /// <param name="enemy">공격 대상</param>
+    /// <param name="effectnum">이펙트 번호</param>
+    IEnumerator Co_AttackAnimation(EnemyManager[] enemy, int effectnum, int type)
     {
         if (!AnimationTrigger)
         {
@@ -51,34 +51,48 @@ public class PlayerManager : CharBase
             SetEffect(trans.transform, effectnum, type);
             for (int i = 0; i < enemy.Length; i++)
             {
-                base.CreateDamage(enemy[i], gameData.playerAttackDamage);
+                base.CreateDamage(enemy[i], gameData.PlayerAttackDamage);
 
-                enemy[i].currentHp -= gameData.playerAttackDamage;
-                if (enemy[i].currentHp <= 0)
+                enemy[i].CurrentHp -= gameData.PlayerAttackDamage;
+                if (enemy[i].CurrentHp <= 0)
                     enemy[i].SetDead = true;
                 else
                     enemy[i].SetHit = true;
             }
+            AudioManager.instance.PlayerSfx(AudioManager.Sfx.Attack);
+
+
         }
         AnimationTrigger = true;
 
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
-    IEnumerator MoveAnimation(EnemyManager[] enemy, int effectnum, int type)
+
+    /// <summary>
+    /// 광역 공격용 이동 애니메이션 코루틴
+    /// </summary>
+    /// <param name="enemy">공격 대상</param>
+    /// <param name="effectnum">이펙트 번호</param>
+    /// <returns></returns>
+    IEnumerator Co_MoveAnimation(EnemyManager[] enemy, int effectnum)
     {
         animator.SetTrigger("Move");
         int h = Random.Range(0,enemy.Length);
         var tween = transform.DOMove(new Vector3(enemy[h].transform.position.x - 0.3f, enemy[h].transform.position.y, 1f), 1.5f);
         yield return tween.WaitForCompletion();
-        StartCoroutine(AttackAnimation(enemy, effectnum, 1));
+
+        StartCoroutine(Co_AttackAnimation(enemy, effectnum, 1));
     }
 
-    IEnumerator ReturnAnimation()
+    /// <summary>
+    /// 이동 후 되돌아오는 애니메이션 코루틴
+    /// </summary>
+    IEnumerator Co_ReturnAnimation()
     {
         transform.localScale = new Vector3(-1f, 1f, 1f);
         animator.SetTrigger("Move");
-        var tween = transform.DOMove(dir, 1.5f);
+        var tween = transform.DOMove(Dir, 1.5f);
         yield return tween.WaitForCompletion();
         transform.localScale = Vector3.one;
         SetAttack = false;
@@ -87,33 +101,57 @@ public class PlayerManager : CharBase
         animator.SetTrigger("Idle");
     }
 
-    IEnumerator MoveAnimation(EnemyManager enemy, int effectnum, int type)
+    /// <summary>
+    /// 이동 애니메이션 코루틴
+    /// </summary>
+    /// <param name="enemy">이동 대상</param>
+    /// <param name="effectnum">이펙트 번호</param>
+    /// <returns></returns>
+    IEnumerator Co_MoveAnimation(EnemyManager enemy, int effectnum, int type)
     {
         animator.SetTrigger("Move");
         var tween = transform.DOMove(new Vector3(enemy.transform.position.x - 0.3f, enemy.transform.position.y, 1.5f), 1);
         yield return tween.WaitForCompletion();
-        StartCoroutine(AttackAnimation(enemy, effectnum, type));
+
+        StartCoroutine(Co_AttackAnimation(enemy, effectnum, type));
     }
 
-    IEnumerator AttackAnimation(EnemyManager enemy, int effectnum, int type)
+    /// <summary>
+    /// 공격 애니메이션 코루틴
+    /// </summary>
+    /// <param name="enemy">공격 대상</param>
+    /// <param name="effectnum">이펙트 번호</param>
+    IEnumerator Co_AttackAnimation(EnemyManager enemy, int effectnum, int type)
     {
         if (!AnimationTrigger)
         {
             animator.SetTrigger("Attack");
-            CreateDamage(enemy, gameData.playerAttackDamage * type);
+            CreateDamage(enemy, gameData.PlayerAttackDamage * type);
 
             SetEffect(enemy.transform, effectnum, type);
-            enemy.currentHp -= gameData.playerAttackDamage * type;
-            if (enemy.currentHp <= 0)
+            enemy.CurrentHp -= gameData.PlayerAttackDamage * type;
+            if (enemy.CurrentHp <= 0)
                 enemy.SetDead = true;
             else
                 enemy.SetHit = true;
+
+            AudioManager.instance.PlayerSfx(AudioManager.Sfx.Attack);
+
         }
         AnimationTrigger = true;
 
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
+    #endregion
+
+    #region AttackMethod
+
+    /// <summary>
+    /// 광역 스킬 메소드
+    /// </summary>
+    /// <param name="enemy">타겟 적</param>
+    /// <param name="effectnum">이펙트 번호</param>
     public override void AllTargetAttack(EnemyManager[] enemy, int effectnum) 
     {
         switch (playerType)
@@ -121,13 +159,15 @@ public class PlayerManager : CharBase
             case Player.Wizard:
                 if (SetAttack)
                 {
+                    AudioManager.instance.PlayerSfx(AudioManager.Sfx.WizardAttack);
+
                     GameObject trans = new GameObject();
                     trans.transform.position = new Vector3(enemy[0].transform.position.x, 0f, 1f);
                     for (int i = 0; i < enemy.Length; i++)
                     {
-                        enemy[i].currentHp -= gameData.playerAttackDamage;
-                        base.CreateDamage(enemy[i], gameData.playerAttackDamage);
-                        if (enemy[i].currentHp <= 0)
+                        enemy[i].CurrentHp -= gameData.PlayerAttackDamage;
+                        base.CreateDamage(enemy[i], gameData.PlayerAttackDamage);
+                        if (enemy[i].CurrentHp <= 0)
                             enemy[i].SetDead = true;
                         else
                             enemy[i].SetHit = true;
@@ -143,16 +183,22 @@ public class PlayerManager : CharBase
             case Player.Miho:
                 if (SetAttack)
                 {
+
                     if (!attackTrigger)
-                        StartCoroutine(MoveAnimation(enemy,effectnum,1));
+                        StartCoroutine(Co_MoveAnimation(enemy,effectnum));
                     else
-                        StartCoroutine(ReturnAnimation());
+                        StartCoroutine(Co_ReturnAnimation());
                 }
 
                 break;
 
         }
     }
+    /// <summary>
+    /// 단일 적 공격 메소드
+    /// </summary>
+    /// <param name="enemy">공격 대상</param>
+    /// <param name="effectnum">이펙트 번호</param>
     public override void Attack(EnemyManager enemy, int effectnum, int type)
     {
         switch (playerType)
@@ -160,11 +206,13 @@ public class PlayerManager : CharBase
             case Player.Wizard:
                 if (SetAttack)
                 {
+                    AudioManager.instance.PlayerSfx(AudioManager.Sfx.WizardAttack);
+
                     animator.SetTrigger("Fire");
                     SetEffect(enemy.transform, effectnum, type);
-                    base.CreateDamage(enemy, gameData.playerAttackDamage * type);
-                    enemy.currentHp -= gameData.playerAttackDamage * type;
-                    if (enemy.currentHp <= 0)
+                    CreateDamage(enemy, gameData.PlayerAttackDamage * type);
+                    enemy.CurrentHp -= gameData.PlayerAttackDamage * type;
+                    if (enemy.CurrentHp <= 0)
                         enemy.SetDead = true;
                     else
                         enemy.SetHit = true;
@@ -175,24 +223,14 @@ public class PlayerManager : CharBase
             case Player.Miho:
                 if (SetAttack)
                 {
+
                     if (!attackTrigger)
-                        StartCoroutine(MoveAnimation(enemy, effectnum, type));
+                        StartCoroutine(Co_MoveAnimation(enemy, effectnum, type));
                     if (attackTrigger)
-                        StartCoroutine(ReturnAnimation());
+                        StartCoroutine(Co_ReturnAnimation());
                 }
                 break;
         }
     }
-  
-    protected override void Init()
-    {
-        skillDamage = gameData.skillDamage;
-        currentHp = gameData.playerCurrentHp;
-        maxHp = gameData.playerMaxHp;
-        attackDamage = gameData.playerAttackDamage;
-    }
-
-
- 
-
+    #endregion
 }

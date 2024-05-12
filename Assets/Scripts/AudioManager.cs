@@ -1,38 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 모든 사운드 관리
+/// </summary>
 public class AudioManager : MonoBehaviour
 {
+    public enum Sfx { Walk, GoScene, UseGold, ExitVillage, Select, WizardAttack, Attack, Heal }
+    public enum Bgm { Field, Battle, Village }
+
     [Header("--Instance--")]
     public static AudioManager instance;
 
     [Header("--Bgm--")]
-    public Bgm bgm;
-    public AudioClip[] bgmClip;
-    public float bgmVolume;
-    AudioSource bgmPlayer;
-    public enum Bgm { Field,Battle,Village}
+    [SerializeField]private AudioClip[] bgmClip;
+    [SerializeField]private float bgmVolume;
+    private AudioSource bgmPlayer;
 
     [Header("--Sfx--")]
-    int sfxChannels = 10;
-    public AudioClip[] sfxClips;
-    public float sfxVolume;
-    AudioSource[] sfxPlayers;
-    public Sfx sfx;
-    public enum Sfx { Walk,GoBattle,GoVillage,UseGold,ExitVillage,Select,StartTurn,MouseOn,WizardAttack,WizardSkill
-    ,MihoAttack,MihoSkill,Heal,Lose,Win}
+    private int sfxChannels = 10;
+    [SerializeField] private AudioClip[] sfxClips;
+    [SerializeField] private float sfxVolume;
+    private AudioSource[] sfxPlayers;
 
-    // Start is called before the first frame update
     private void Awake()
     {
-        DontDestroyOnLoad(this);
-        instance = this;
+        //싱글톤
+        if(instance == null) {
+            instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else {
+            Destroy(gameObject);
+        }
         InitBgm();
         InitSfx();
     }
-   
-    void InitBgm()
+
+    /// <summary>
+    /// bgm 초기화
+    /// </summary>
+    private void InitBgm()
     {
         GameObject bgmObject = new GameObject("BgmPlayer");
         bgmObject.transform.parent = transform;
@@ -43,7 +50,10 @@ public class AudioManager : MonoBehaviour
         bgmPlayer.clip = bgmClip[(int)Bgm.Field];
     }
 
-    void InitSfx()
+    /// <summary>
+    /// sfx 초기화
+    /// </summary>
+    private void InitSfx()
     {
         GameObject sfxObject = new GameObject("SfxPlayer");
         sfxObject.transform.parent = transform;
@@ -58,6 +68,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// bgm 실행 및 중지
+    /// </summary>
+    /// <param name="bgm">실행 및 중지 할 bgm</param>
+    /// <param name="islive">실행 및 중지 여부</param>
     public void PlayerBgm(Bgm bgm, bool islive)
     {
         bgmPlayer.clip = bgmClip[(int)bgm];
@@ -67,6 +82,10 @@ public class AudioManager : MonoBehaviour
             bgmPlayer.Stop();
     }
 
+    /// <summary>
+    /// sfx 실행
+    /// </summary>
+    /// <param name="sfx">실행할 sfx</param>
     public void PlayerSfx(Sfx sfx)
     {
         for (int i = 0; i < sfxPlayers.Length; i++)

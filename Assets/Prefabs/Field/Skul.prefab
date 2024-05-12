@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6983375979838939676}
   - component: {fileID: 285612588919993716}
   - component: {fileID: 5064708387771282662}
-  - component: {fileID: 7950440378397029581}
+  - component: {fileID: 428850819747167430}
   m_Layer: 0
   m_Name: Skul
   m_TagString: FieldEnemy
@@ -182,7 +182,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7950440378397029581
+--- !u!114 &428850819747167430
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -194,10 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d261d7604096f8240befbc76c2cd53c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 0
-  nextMoveX: 0
-  nextMoveY: 0
-  speed: 1
+  speed: 0.5
 --- !u!1 &1129260878743580755
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,29 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using static PlayerManager;
 
+/// <summary>
+/// 필드 씬 플레이어 관리
+/// </summary>
 public class FieldPlayerManager : MonoBehaviour
 {
+    #region Variable
     [Header("--Info--")]
-    public float speed;
-    public Vector2 moveDir;
-    Rigidbody2D rigid;
-
+    //플레이어 이동 속도
+    [SerializeField]private float speed;
+    //플레이어 이동 방향
+    private Vector2 moveDir;
+    private Rigidbody2D rigid;
+    //이동 사운드 출력 타이머
+    private float walkAudioTimer;
     [Header("--GameData--")]
-    public GameData gameData;
+    //게임 데이터
+    [SerializeField]private GameData gameData;
 
     [Header("--Enemy--")]
-    public FieldEnemy enemy;
+    //충돌 애너미 보관
+    private FieldEnemy enemy;
 
     [Header("--Effect--")]
-    public GameObject dustPrefab;
-    float dustTimer;
+    //발먼지 프리펩
+    [SerializeField] private GameObject dustPrefab;
+    //발먼지 이펙트 출력 타이머
+    private float dustTimer;
 
-    Animator animator;
+    private Animator animator;
+
+    #endregion
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -32,21 +40,28 @@ public class FieldPlayerManager : MonoBehaviour
     }
     private void Start()
     {
-        transform.position = gameData.playerFieldPosition;
+        transform.position = gameData.PlayerFieldPosition;
     }
 
-    // Update is called once per frame
+    #region UpdateMethod
     void Update()
     {
-        if (!FieldGameManager.Instance.isPlaying)
+        if (!FieldGameManager.Instance.IsPlaying)
             return;
 
         PlayerAnimation();
+        walkAudioTimer += Time.deltaTime;
+
+        if (walkAudioTimer > 0.3f && moveDir.magnitude > 0)
+        {
+            AudioManager.instance.PlayerSfx(AudioManager.Sfx.Walk);
+            walkAudioTimer = 0;
+        }
     }
 
     private void FixedUpdate()
     {
-        if (!FieldGameManager.Instance.isPlaying)
+        if (!FieldGameManager.Instance.IsPlaying)
             return;
 
         rigid.MovePosition(rigid.position + moveDir.normalized * speed * Time.deltaTime);
@@ -54,7 +69,7 @@ public class FieldPlayerManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!FieldGameManager.Instance.isPlaying)
+        if (!FieldGameManager.Instance.IsPlaying)
             return;
 
         CreateDustEffect();
@@ -62,18 +77,23 @@ public class FieldPlayerManager : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!FieldGameManager.Instance.isPlaying)
+        if (!FieldGameManager.Instance.IsPlaying)
             return;
 
         CollisionObject(collision);
     }
+    #endregion
 
+    /// <summary>
+    /// 충돌한 오브젝트에 맞는 씬으로 이동
+    /// </summary>
+    /// <param name="collision">충돌한 오브젝트</param>
     void CollisionObject(Collision2D collision)
     {
         if (collision.collider.CompareTag("FieldEnemy"))
         {
             enemy = collision.gameObject.GetComponent<FieldEnemy>();
-            gameData.playerFieldPosition = transform.position;
+            gameData.PlayerFieldPosition = transform.position;
 
             FieldGameManager.Instance.ActionFade((int)FieldGameManager.Scenes.BattleScene);
             AudioManager.instance.PlayerBgm(AudioManager.Bgm.Field, false);
@@ -84,12 +104,15 @@ public class FieldPlayerManager : MonoBehaviour
             Vector3 villagePos = collision.transform.position;
             Vector3 nextDir = villagePos - transform.position;
             nextDir = nextDir.normalized;
-            gameData.playerFieldPosition = transform.position + nextDir * 2f;
+            gameData.PlayerFieldPosition = transform.position + nextDir * 2f;
             FieldGameManager.Instance.ActionFade((int)FieldGameManager.Scenes.VillageScene);
             AudioManager.instance.PlayerBgm(AudioManager.Bgm.Field, false);
         }
     }
 
+    /// <summary>
+    /// 발먼지 이펙트 출력
+    /// </summary>
     void CreateDustEffect()
     {
         dustTimer += Time.deltaTime;
@@ -104,9 +127,12 @@ public class FieldPlayerManager : MonoBehaviour
 
     public FieldEnemy DestroyEnemy()
     {
-        return enemy;
+        return enemy == null ? null : enemy;
     }
 
+    /// <summary>
+    /// 플레이어 이동 애니메이션 출력
+    /// </summary>
     void PlayerAnimation()
     {
         moveDir.x = Input.GetAxisRaw("Horizontal");

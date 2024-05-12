@@ -1,65 +1,82 @@
 using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.U2D.Aseprite;
 using UnityEngine;
-using static EnemyManager;
 
+/// <summary>
+/// 애너미 유닛 관리
+/// </summary>
 public class EnemyManager : CharBase
 {
     public enum Enemy { Skul, Mumi, Mumis }
     public Enemy enemyType;
 
-
-    // Start is called before the first frame update
     protected override void Awake()
     {
-        base.Awake();//애니메이터 겟컴포넌트
-        currentHp = maxHp;
-        charName = enemyType.ToString();
+        base.Awake();
+        CurrentHp = MaxHp;
+        CharName = enemyType.ToString();
     }
 
     protected override void Update()
     {
-        base.Update();//부모 update 실행
-        base.craeteDustEffect(6f);
-        base.ShowHpBar(MouseManager.instance.MouseRayCast("Enemy"));//다른자식과 다른내용의 함수
-        hpBar.value = currentHp / maxHp;
+        base.Update();
+        craeteDustEffect(6f);
+        ShowHpBar(MouseManager.instance.MouseRayCast("Enemy"));
+        hpBar.value = CurrentHp / MaxHp;
     }
-
-    IEnumerator MoveAnimation(PlayerManager player)
+    #region AnimatonMethod
+    /// <summary>
+    /// 이동 애니메이션 출력
+    /// </summary>
+    /// <param name="player">이동 목표</param>
+    /// <returns></returns>
+    private IEnumerator Co_MoveAnimation(PlayerManager player)
     {
         animator.SetTrigger("Move");
         var tween = transform.DOMove(new Vector3(player.transform.position.x + 0.3f, player.transform.position.y, 1f), 1.5f).SetEase(base.charEase);
         yield return tween.WaitForCompletion();
-        StartCoroutine(AttackAnimation(player));
+
+        StartCoroutine(Co_AttackAnimation(player));
     }
 
-    IEnumerator AttackAnimation(PlayerManager player)
+    /// <summary>
+    /// 공격 애니메이션 출력
+    /// </summary>
+    /// <param name="player">공격 대상</param>
+    /// <returns></returns>
+    private IEnumerator Co_AttackAnimation(PlayerManager player)
     {
         if (!AnimationTrigger && transform.position.x < 0)
         {
             animator.SetTrigger("Attack");
-            Instantiate(effectPrefabs[0], player.transform);
-            base.CreateDamage(player,attackDamage);
-            player.gameData.playerCurrentHp -= attackDamage;
 
-            if (player.gameData.playerCurrentHp <= 0)
+            Instantiate(EffectPrefabs[0], player.transform);
+            CreateDamage(player,AttackDamage);
+            player.gameData.PlayerCurrentHp -= AttackDamage;
+
+            if (player.gameData.PlayerCurrentHp <= 0)
                 player.SetDead = true;
             else
                 player.SetHit = true;
+
+            AudioManager.instance.PlayerSfx(AudioManager.Sfx.Attack);
+
         }
+
         AnimationTrigger = true;
 
         yield return new WaitForSeconds(0.5f);
         attackTrigger = true;
     }
 
-    IEnumerator ReturnAnimation()
+    /// <summary>
+    /// 공격 후 되돌아오는 애니메이션 출력
+    /// </summary>
+    private IEnumerator Co_ReturnAnimation()
     {
         transform.localScale = Vector3.one;
         animator.SetTrigger("Move");
-        var tween = transform.DOMove(dir, 1.5f).SetEase(base.charEase);
+        var tween = transform.DOMove(Dir, 1.5f).SetEase(base.charEase);
         yield return tween.WaitForCompletion();
         transform.localScale = new Vector3(-1f, 1f, 1f);
         SetAttack = false;
@@ -67,14 +84,20 @@ public class EnemyManager : CharBase
         AnimationTrigger = false;
         animator.SetTrigger("Idle");
     }
+    #endregion
+
+    /// <summary>
+    /// 공격
+    /// </summary>
+    /// <param name="player">공격 대상</param>
     public override void Attack(PlayerManager player)
     {
         if (SetAttack)
         {
             if (!attackTrigger)
-                StartCoroutine(MoveAnimation(player));
+                StartCoroutine(Co_MoveAnimation(player));
             else
-                StartCoroutine(ReturnAnimation());
+                StartCoroutine(Co_ReturnAnimation());
         }
     }
 }

@@ -5119,12 +5119,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -5687,59 +5687,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &872776323
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 872776325}
-  - component: {fileID: 872776324}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &872776324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872776323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab697f1649381e644a06964270588626, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bgm: 0
-  bgmClip:
-  - {fileID: 8300000, guid: 0ad591428b0c18c4da51fe3bf98dbc63, type: 3}
-  - {fileID: 8300000, guid: fc5af015011ea3745b7f78ea1dd1049f, type: 3}
-  - {fileID: 8300000, guid: bef0cef2ded0f0645ad90c6e5bdd4965, type: 3}
-  bgmVolume: 0.3
-  sfxClips: []
-  sfxVolume: 0
-  sfx: 0
---- !u!4 &872776325
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 872776323}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5601687, y: -0.5233101, z: 0.26666644}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &872854533
 GameObject:
   m_ObjectHideFlags: 0
@@ -7561,57 +7508,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &1382804825
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1382804827}
-  - component: {fileID: 1382804826}
-  m_Layer: 0
-  m_Name: FinalManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1382804826
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1382804825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a030bf7706b5d6c4fb2d44ceb8b06740, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameDatas:
-  - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
-  - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
-  - {fileID: 11400000, guid: 84cef539c50907949a84177b74a89be0, type: 2}
-  - {fileID: 11400000, guid: 3e001dbf56f2a0349980c4aa8ef97a07, type: 2}
-  - {fileID: 11400000, guid: cba8750eef445ed40adea1d0a0e74e85, type: 2}
-  - {fileID: 11400000, guid: 9788d06c79307514eaaf54ada3e10e3e, type: 2}
---- !u!4 &1382804827
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1382804825}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5682541, y: 1.5723119, z: -0.17768389}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1413908929
 GameObject:
   m_ObjectHideFlags: 0
@@ -8183,20 +8079,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1efd77e7c6df01d4cbd94ef50a54555a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlaying: 0
-  scenes: 0
   fadeImage: {fileID: 614085961}
-  fadeCount: 0
-  fadeOn: 0
   goldText: {fileID: 1726300716}
   players: {fileID: 1887521786}
   gameData:
   - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}
   - {fileID: 11400000, guid: 84cef539c50907949a84177b74a89be0, type: 2}
-  currentPlyerNum: 0
-  currentPlayerGold: 0
-  player: {fileID: 677206677}
+  Player: {fileID: 677206677}
 --- !u!4 &1557220279
 Transform:
   m_ObjectHideFlags: 0
@@ -26983,8 +26873,6 @@ SceneRoots:
   - {fileID: 289648952}
   - {fileID: 1532032503}
   - {fileID: 911609370}
-  - {fileID: 1382804827}
-  - {fileID: 872776325}
   - {fileID: 1557220279}
   - {fileID: 1035479604}
   - {fileID: 1177335579}

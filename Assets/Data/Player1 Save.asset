@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c08df650cdf93346a45805695a397be, type: 3}
   m_Name: Player1 Save
   m_EditorClassIdentifier: 
-  currentGold: 0
-  currentPlayerNumber: 3
-  playerCurrentHp: 200
-  playerMaxHp: 200
-  playerCurrenMp: 50
-  playerMaxMp: 50
-  playerAttackDamage: 15
+  CurrentPlayerNumber: 1
+  PlayerFieldPosition: {x: 0, y: 0}
+  LevelUseGold: 50
+  PlusPlayerGold: 150
+  CurrentGold: 50
+  PlayerCurrentHp: 100
+  PlayerMaxHp: 100
+  PlayerCurrentMp: 60
+  PlayerMaxMp: 60
+  PlayerAttackDamage: 20
   PlayerName: Wizard
   PlayerCurrendExp: 0
   PlayerMaxExp: 100
-  playerFieldPosition: {x: 0, y: 0}
-  levelUseGold: 50
-  plusPlayerGold: 300
-  playerLevel: 1
-  skillDamage: 30
+  PlayerLevel: 1
+  SkillDamage: 25

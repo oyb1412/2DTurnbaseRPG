@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
+/// <summary>
+/// 각 턴 상태 관리
+/// </summary>
 public class StateManager : MonoBehaviour
 {
     [Header("--Instance--")]
     public static StateManager instance;
 
     [Header("--StateInfo--")]
-    public BattleState currentState;
+    public BattleState CurrentState;
     public enum BattleState { StartTurn, PlayerTurn, EnemyTurn, Win, Lose }
-
 
     private void Awake()
     {
@@ -21,7 +19,6 @@ public class StateManager : MonoBehaviour
     }
     private void Start()
     {
-        currentState = BattleState.StartTurn;
+        CurrentState = BattleState.StartTurn;
     }
- 
 }

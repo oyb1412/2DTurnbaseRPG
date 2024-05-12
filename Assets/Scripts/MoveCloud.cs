@@ -1,7 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 필드 씬 구름 관리
+/// </summary>
 public class MoveCloud : MonoBehaviour
 {
     void Update()
@@ -10,6 +11,5 @@ public class MoveCloud : MonoBehaviour
              transform.Translate(new Vector3(-0.001f, 0, 0));
         else
             transform.Translate(new Vector3(24f, 0, 0));
-
     }
 }

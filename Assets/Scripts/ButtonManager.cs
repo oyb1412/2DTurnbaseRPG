@@ -1,20 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
+/// <summary>
+/// Village 씬에서의 버튼 관리
+/// </summary>
 public class ButtonManager : MonoBehaviour
 {
     [Header("--GameData--")]
-    public GameData[] gameDatas;
+    [SerializeField]private GameData[] gameDatas;
 
     [Header("--Button--")]
-    public Button[] itemButton;
+    //각 아이템 구매 버튼
+    [SerializeField] private Button[] itemButton;
 
     [Header("--Text--")]
-    public Text currentGoldText;
-    Text[] needGoldTexts;
+    [SerializeField] private Text currentGoldText;
+    //아이템 구매에 필요한 골드
+    private Text[] needGoldTexts;
     private void Awake()
     {
         needGoldTexts = new Text[itemButton.Length]; 
@@ -24,80 +26,107 @@ public class ButtonManager : MonoBehaviour
         }
         needGoldTexts[0].text = string.Format("need {0} gold", 100);
     }
-    public void MaxHpClick()
-    {
-        for (int i = 0; i < gameDatas.Length; i++)
-        {
-            gameDatas[i].playerCurrentHp = gameDatas[i].playerMaxHp;
-            gameDatas[i].playerCurrenMp = gameDatas[i].playerMaxMp;
 
-        }
-        gameDatas[0].currentGold -= 100;
-    }
-
-    private void Update()
-    {
+    private void Update() {
         ButtonText();
         ButtonInteractable();
     }
-    public void LevelUpClick()
+
+    #region CallbackMethod
+    /// <summary>
+    /// HP회복 아이템(콜백으로 호출)
+    /// </summary>
+    public void MaxHpClick()
     {
+        AudioManager.instance.PlayerSfx(AudioManager.Sfx.UseGold);
+
         for (int i = 0; i < gameDatas.Length; i++)
         {
-            if (gameDatas[0].currentPlayerNumber > i)
+            gameDatas[i].PlayerCurrentHp = gameDatas[i].PlayerMaxHp;
+            gameDatas[i].PlayerCurrentMp = gameDatas[i].PlayerMaxMp;
+
+        }
+        gameDatas[0].CurrentGold -= 100;
+    }
+
+
+
+    /// <summary>
+    /// 레벨업 아이템 구매(콜백으로 호출)
+    /// </summary>
+    public void LevelUpClick()
+    {
+        AudioManager.instance.PlayerSfx(AudioManager.Sfx.UseGold);
+
+        for (int i = 0; i < gameDatas.Length; i++)
+        {
+            if (gameDatas[0].CurrentPlayerNumber > i)
             {
-                if (gameDatas[i].playerCurrentHp > 0)
+                if (gameDatas[i].PlayerCurrentHp > 0)
                 {
-                    gameDatas[i].playerLevel++;
-                    gameDatas[i].playerAttackDamage += 2;
-                    gameDatas[i].playerMaxHp += 10;
-                    gameDatas[i].playerMaxMp += 5;
-                    gameDatas[i].skillDamage += 3;
+                    gameDatas[i].PlayerLevel++;
+                    gameDatas[i].PlayerAttackDamage += 2;
+                    gameDatas[i].PlayerMaxHp += 10;
+                    gameDatas[i].PlayerMaxMp += 5;
+                    gameDatas[i].SkillDamage += 3;
                 }
             }
         }
-        gameDatas[0].currentGold -= gameDatas[0].levelUseGold;
+        gameDatas[0].CurrentGold -= gameDatas[0].LevelUseGold;
     }
 
+    /// <summary>
+    /// 플레이어 유닛 추가 아이템 구매(콜백으로 호출)
+    /// </summary>
     public void PlusPlayerClick()
     {
-        gameDatas[0].currentPlayerNumber++;
-        gameDatas[0].currentGold -= gameDatas[0].plusPlayerGold;
+        AudioManager.instance.PlayerSfx(AudioManager.Sfx.UseGold);
+
+        gameDatas[0].CurrentPlayerNumber++;
+        gameDatas[0].CurrentGold -= gameDatas[0].PlusPlayerGold;
 
     }
 
+    /// <summary>
+    /// 마을 나가기(콜백으로 호출)
+    /// </summary>
     public void ReturnField()
     {
+         AudioManager.instance.PlayerSfx(AudioManager.Sfx.GoScene);
         VillageGameManager.instance.ActionFade((int)VillageGameManager.Scenes.FieldScene);
         AudioManager.instance.PlayerBgm(AudioManager.Bgm.Village, false);
     }
+    #endregion
 
-
-
-    void ButtonText()
+    /// <summary>
+    /// 각 아이템 구매에 필요한 텍스트 출력
+    /// </summary>
+    private void ButtonText()
     {
-        needGoldTexts[1].text = string.Format("need {0} gold", gameDatas[0].levelUseGold);
-        needGoldTexts[2].text = string.Format("need {0} gold", gameDatas[0].plusPlayerGold);
-        currentGoldText.text = gameDatas[0].currentGold.ToString();
+        needGoldTexts[1].text = string.Format("need {0} gold", gameDatas[0].LevelUseGold);
+        needGoldTexts[2].text = string.Format("need {0} gold", gameDatas[0].PlusPlayerGold);
+        currentGoldText.text = gameDatas[0].CurrentGold.ToString();
     }
 
-    void ButtonInteractable()
+    /// <summary>
+    /// 골드 부족시 버튼 비활성화
+    /// </summary>
+    private void ButtonInteractable()
     {
-        if (gameDatas[0].playerCurrentHp == gameDatas[0].playerMaxHp &&
-            gameDatas[1].playerCurrentHp == gameDatas[1].playerMaxHp &&
-            gameDatas[2].playerCurrentHp == gameDatas[2].playerMaxHp ||
-            gameDatas[0].currentGold < 100)
+        if (gameDatas[0].PlayerCurrentHp == gameDatas[0].PlayerMaxHp &&
+            gameDatas[1].PlayerCurrentHp == gameDatas[1].PlayerMaxHp &&
+            gameDatas[2].PlayerCurrentHp == gameDatas[2].PlayerMaxHp ||
+            gameDatas[0].CurrentGold < 100)
         {
             itemButton[0].interactable = false;
         }
 
-
-        if (gameDatas[0].currentGold < gameDatas[0].levelUseGold)
+        if (gameDatas[0].CurrentGold < gameDatas[0].LevelUseGold)
         {
             itemButton[1].interactable = false;
         }
 
-        if (gameDatas[0].currentGold < gameDatas[0].plusPlayerGold || gameDatas[0].currentPlayerNumber >= 3)
+        if (gameDatas[0].CurrentGold < gameDatas[0].PlusPlayerGold || gameDatas[0].CurrentPlayerNumber >= 3)
         {
             itemButton[2].interactable = false;
         }

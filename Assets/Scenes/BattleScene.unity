@@ -4600,12 +4600,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -6757,29 +6757,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eb160f1b4b488b4abd4213ed05308a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chars: []
   skillButtons: {fileID: 135165344}
   arrowImage: {fileID: 1360567896}
   battleInfoImage: {fileID: 593592666}
-  buttons:
-  - {fileID: 924026673}
-  - {fileID: 222686126}
-  - {fileID: 0}
-  EenmyInfoImage: {fileID: 1831560347}
+  skillButton: {fileID: 222686126}
+  EnemyInfoImage: {fileID: 1831560347}
   PlayerInfoImage: {fileID: 518667045}
   cursurIcon: {fileID: 2800000, guid: dcf4d3883f0c0ec469e4faa7607022a4, type: 3}
   buttonsParent: {fileID: 603218175}
   buttonInfoImage: {fileID: 67232350}
-  buttonInfoText: {fileID: 0}
-  battleInfoText: {fileID: 0}
-  EnemyInfoText: {fileID: 0}
-  PlayerInfoText: {fileID: 0}
-  state: 0
-  myTurn: 0
-  deadCount: 0
-  trigger: 0
-  attackTrigger: 0
-  currentPlayerNumber: 0
   gameData:
   - {fileID: 11400000, guid: e9962a2cf2b4bf0498fef1de53f31c9f, type: 2}
   - {fileID: 11400000, guid: 3cca97df938188d4c8b82cdfa93378bd, type: 2}

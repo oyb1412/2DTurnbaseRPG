@@ -1,41 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 게임 종료 시 데이터 초기화
+/// </summary>
 public class FinalManager : MonoBehaviour
 {
     [Header("--GameData--")]
-    public GameData[] gameDatas;
-    // Start is called before the first frame update
-    private void Awake()
-    {
-        DataInit();
-
-    }
+    [SerializeField]private GameData[] gameDatas;
 
     private void OnApplicationQuit()
     {
+        DataInit();
     }
 
     void DataInit()
     {
         for (int i = 0; i < 3; i++)
         {
-            gameDatas[i].currentPlayerNumber = gameDatas[i + 3].currentPlayerNumber;
+            gameDatas[i].CurrentPlayerNumber = gameDatas[i + 3].CurrentPlayerNumber;
 
-            gameDatas[i].currentGold = gameDatas[i + 3].currentGold;
-            gameDatas[i].playerCurrentHp = gameDatas[i + 3].playerCurrentHp;
-            gameDatas[i].playerMaxHp = gameDatas[i + 3].playerMaxHp;
-            gameDatas[i].playerCurrenMp = gameDatas[i + 3].playerCurrenMp;
-            gameDatas[i].playerMaxMp = gameDatas[i + 3].playerMaxMp;
+            gameDatas[i].CurrentGold = gameDatas[i + 3].CurrentGold;
+            gameDatas[i].PlayerCurrentHp = gameDatas[i + 3].PlayerCurrentHp;
+            gameDatas[i].PlayerMaxHp = gameDatas[i + 3].PlayerMaxHp;
+            gameDatas[i].PlayerCurrentMp = gameDatas[i + 3].PlayerCurrentMp;
+            gameDatas[i].PlayerMaxMp = gameDatas[i + 3].PlayerMaxMp;
             gameDatas[i].PlayerCurrendExp = gameDatas[i + 3].PlayerCurrendExp;
             gameDatas[i].PlayerMaxExp = gameDatas[i + 3].PlayerMaxExp;
-            gameDatas[i].playerAttackDamage = gameDatas[i + 3].playerAttackDamage;
-            gameDatas[i].playerFieldPosition = gameDatas[i + 3].playerFieldPosition;
-            gameDatas[i].levelUseGold = gameDatas[i + 3].levelUseGold;
-            gameDatas[i].plusPlayerGold = gameDatas[i + 3].plusPlayerGold;
-            gameDatas[i].playerLevel = gameDatas[i + 3].playerLevel;
-            gameDatas[i].skillDamage = gameDatas[i + 3].skillDamage;
+            gameDatas[i].PlayerAttackDamage = gameDatas[i + 3].PlayerAttackDamage;
+            gameDatas[i].PlayerFieldPosition = gameDatas[i + 3].PlayerFieldPosition;
+            gameDatas[i].LevelUseGold = gameDatas[i + 3].LevelUseGold;
+            gameDatas[i].PlusPlayerGold = gameDatas[i + 3].PlusPlayerGold;
+            gameDatas[i].PlayerLevel = gameDatas[i + 3].PlayerLevel;
+            gameDatas[i].SkillDamage = gameDatas[i + 3].SkillDamage;
             gameDatas[i].PlayerName = gameDatas[i + 3].PlayerName;
 
         }

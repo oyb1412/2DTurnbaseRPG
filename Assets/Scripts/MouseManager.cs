@@ -1,17 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 마우스 관리
+/// </summary>
 public class MouseManager : MonoBehaviour
 {
     [Header("--Instance--")]
     public static MouseManager instance;
-    // Start is called before the first frame update
     private void Awake()
     {
         instance = this;
     }
 
+    /// <summary>
+    /// 마우스 Enter오브젝트 반환
+    /// </summary>
+    /// <param name="tag">검출 tag</param>
+    /// <returns></returns>
     public Collider2D MouseRayCast(string tag)
     {
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);

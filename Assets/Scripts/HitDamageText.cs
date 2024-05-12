@@ -1,17 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 타격시 데미지 텍스트
+/// </summary>
 public class HitDamageText : MonoBehaviour
 {
-    float destroyTimer;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private float destroyTimer;
 
-    // Update is called once per frame
     void Update()
     {
         destroyTimer += Time.deltaTime;
